@@ -1,8 +1,9 @@
 function Home() {
  return (
  <div>
- <h2>Home</h2>
- <p>Welcome to FoodLoop!</p>
+ <h2>FoodLoop</h2>
+ <h3>Help feed the loop of nourishment!</h3>
+ <p>se poate schimba</p>
  </div>
  );
 }
