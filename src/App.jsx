@@ -1,6 +1,11 @@
+import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import LoginButton from './LoginButton';
-import LogoutButton from './LogoutButton';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+import LandingPage from './pages/LandingPage';
+import Home from './pages/Home';
+import About from './pages/About'; 
+
 import Profile from './Profile';
 
 function App() {
@@ -29,35 +34,15 @@ function App() {
   }
 
   return (
-    <div className="app-container">
-      <div className="main-card-wrapper">
-        <img
-          src="https://cdn.auth0.com/quantum-assets/dist/latest/logos/auth0/auth0-lockup-en-ondark.png"
-          alt="Auth0 Logo"
-          className="auth0-logo"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-          }}
-        />
-        <h1 className="main-title">Welcome to Sample0</h1>
-
-        {isAuthenticated ? (
-          <div className="logged-in-section">
-            <div className="logged-in-message">✅ Successfully authenticated!</div>
-            <h2 className="profile-section-title">Your Profile</h2>
-            <div className="profile-card">
-              <Profile />
-            </div>
-            <LogoutButton />
-          </div>
-        ) : (
-          <div className="action-card">
-            <p className="action-text">Get started by signing in to your account</p>
-            <LoginButton />
-          </div>
-        )}
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/home" element={isAuthenticated ? <Home /> : <LandingPage />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/" />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

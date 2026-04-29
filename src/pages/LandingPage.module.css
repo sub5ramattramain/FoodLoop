@@ -1,0 +1,126 @@
+.landingWrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.heroSplit {
+    display: flex;
+    min-height: 80vh;
+}
+
+.heroTextSide {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem;
+    background-color: var(--color-bg-light);
+}
+
+.heroTitle {
+    font-size: 3.5rem;
+    color: var(--color-text-dark);
+    line-height: 1.2;
+    margin-bottom: 1rem;
+}
+
+.heroImageSide {
+    flex: 1;
+    display: flex;
+    background-color: var(--color-primary);
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.heroSubtitle {
+    font-size: 1.2rem;
+    color: #555;
+    margin-bottom: 2rem;
+    max-width: 500px;
+}
+
+.highlight {
+    color: var(--color-primary);
+}
+
+.heroButtons {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.btnPrimary {
+    background-color: var(--color-secondary);
+    color: #000;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    font-weight: bold;
+}
+
+.btnPrimary:hover {
+    opacity: 0.9;
+}
+
+.btnSecondary {
+    background-color: transparent;
+    color: var(--color-text-dark);
+    padding: 1rem 2rem;
+    border: 2px solid var(--color-text-dark);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.foodImage {
+    width: 70%;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3));
+    transition: transform 0.3s ease;
+}
+
+.foodImage:hover {
+    transform: scale(1.05) rotate(2deg);
+}
+
+.categoriesSection
+{
+    padding: 4rem 2rem;
+    background-color: #fff;
+}
+
+.categoriesTitle
+{
+    text-align: center;
+    color: var(--color-primary);
+    margin-bottom: 2rem;
+}
+
+.categoriesGrid
+{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.categoriesCard {
+    background-color: var(--color-bg-light);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+    cursor: pointer;
+    color: var(--color-primary);
+    font-weight: bold;
+}
+
+.categoriesCard:hover {
+    transform: translateY(-5px);
+}
