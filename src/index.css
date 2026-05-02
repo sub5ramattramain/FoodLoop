@@ -5,9 +5,14 @@
     --color-text-dark: #2c3e50;
 }
 
-body
-{
+body {
     margin: 0;
     font-family: 'Inter', sans-serif;
     background-color: var(--color-bg-light);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
