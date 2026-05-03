@@ -42,10 +42,30 @@ app.get('/', function(req, res) {
 // Date (temporar in memorie, vom folosi MongoDB mai tarziu)
 
 
-//  returneaza toate produsele
+//  returneaza toate produsele in functie de filtre
 app.get('/api/products', async function(req, res) {
  try {
- const products = await Products.find();
+ const query = {};
+ if(req.query.tags){
+  const tagList = req.query.tags.split(',').map(tag => tag.trim());
+  query.$or = tagList.map(t => ({tag: { $regex: t, $options: 'i' }}));
+ }
+
+ if (req.query.minim_reducere) {
+  query.reducere = { $gte: Number(req.query.minim_reducere) }; //asta e pentru cautarea produselor care au reducere peste 50%
+ }
+
+ if (req.query.ridicare) {
+  // Cauta produsele care au intervalul specificat (adica dimineata, pranz sau seara)
+  query.ridicare = { $regex: req.query.ridicare, $options: 'i' };
+}
+
+  if (req.query.nume) {
+      query.produs = { $regex: req.query.nume, $options: 'i' }; //cauta dupa nume
+    }
+
+ const products = await Products.find(query);
+
  res.json(products);
  } catch (err) {
  res.status(500).json({ error: 'Eroare ' + err });
@@ -97,7 +117,11 @@ app.post('/api/products', upload.single('image'), async function(req, res) {
  pret_lei: req.body.pret_lei,
  numar_valabil: req.body.numar_valabil,
  adresa: req.body.adresa,
- image: req.file ? `/uploads/${req.file.filename}` : ""
+ image: req.file ? `/uploads/${req.file.filename}` : "",
+ tag: req.body.tag,
+ reducere: req.body.reducere,
+ ridicare: req.body.ridicare,
+ comanda: req.body.comanda
  });
  const saved = await newProduct.save();
  res.status(201).json(saved);
@@ -106,23 +130,6 @@ app.post('/api/products', upload.single('image'), async function(req, res) {
  }
 });
 
-/*
-
-testare adaugare:
-fetch('http://localhost:3000/api/products', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ 
-    produs: "Telemea de munte", 
-    magazin: "Piata Sfatului", 
-    pret_lei: 25, 
-    numar_valabil: 10, 
-    adresa: "Brasov, Centru" 
-  })
-})
-.then(r => r.json())
-.then(data => console.log('Produs salvat în DB:', data));
-*/
 
 //Functie delete
 app.delete('/api/products/:id', async function (req, res) {
@@ -139,33 +146,7 @@ app.delete('/api/products/:id', async function (req, res) {
   }
 });
 
-/*
-testare delete:
-const idDeSters = 'ID_COPIAT_AICI'; 
 
-fetch(`http://localhost:3000/api/products/${idDeSters}`, { 
-  method: 'DELETE' 
-})
-.then(r => r.json())
-.then(data => console.log('Rezultat ștergere:', data));
-*/
-
-
-/*
-testare update:
-const idDeModificat = 'ID_COPIAT_AICI';
-
-fetch(`http://localhost:3000/api/products/${idDeModificat}`, {
-  method: 'PUT',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ 
-    pret_lei: 30,
-    numar_valabil: 5 
-  })
-})
-.then(r => r.json())
-.then(data => console.log('Produs actualizat:', data));
-*/
 
 // Nu se mai pune nimic dupa app.listen
 app.listen(PORT, function() {
