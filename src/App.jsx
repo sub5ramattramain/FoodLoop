@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Home from './pages/Home';
 import About from './pages/About'; 
+import Navbar from './Navbar';
 
 import Profile from './Profile';
 
@@ -35,9 +36,11 @@ function App() {
 
   return (
     <BrowserRouter>
+      <Navbar />
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/home" element={isAuthenticated ? <Home /> : <LandingPage />} />
+        <Route path="/" element={isAuthenticated ? <Home /> : <LandingPage />} />///cazul in care clientul e logat va fi trimis la dashboard
+
+        <Route path="/home" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/" />} />
         <Route path="*" element={<Navigate to="/" />} />

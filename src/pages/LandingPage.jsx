@@ -2,15 +2,12 @@ import React, { use } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import styles from './LandingPage.module.css';
 import heroImage from '../assets/images.jpg';
-import Navbar from '../Navbar';
 
 function LandingPage() {
     const { loginWithRedirect } = useAuth0();
 
     return (
-        <>
-            <Navbar />
-            
+        <>  
             <div className={styles.landingWrapper}>
                 <section className={styles.heroSplit}>
                     <div className={styles.heroTextSide}>

@@ -54,3 +54,32 @@
     font-weight: bold;
     cursor: pointer;
 }
+
+.userMenu {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.profilePic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--color-primary);
+    object-fit: cover;
+}
+
+.postBtn {
+    background-color: var(--color-secondary);
+    color: #000;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.postBtn:hover {
+    opacity: 0.8;
+}
