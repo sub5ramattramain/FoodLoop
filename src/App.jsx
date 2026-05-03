@@ -4,9 +4,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Home from './pages/Home';
 import About from './pages/About';
-import Navbar from './Navbar';
+import Navbar from './components/Navbar';
 
-import Profile from './Profile';
+import Profile from './pages/Profile';
 
 import { useAppAuth } from './hooks/useAppAuth';
 

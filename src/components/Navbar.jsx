@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './Navbar.module.css';
 import { Link } from 'react-router-dom';
-import { useAppAuth } from './hooks/useAppAuth';
+import { useAppAuth } from '../hooks/useAppAuth';
 
 function Navbar() {
     const { isUserLoggedIn, profilePicture, loginWithRedirect, handleLogout } = useAppAuth();
