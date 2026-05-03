@@ -1,16 +1,17 @@
 import React from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import LandingPage from './pages/LandingPage';
 import Home from './pages/Home';
-import About from './pages/About'; 
+import About from './pages/About';
 import Navbar from './Navbar';
 
 import Profile from './Profile';
 
+import { useAppAuth } from './hooks/useAppAuth';
+
 function App() {
-  const { isAuthenticated, isLoading, error } = useAuth0();
+  const { isUserLoggedIn, isLoading, error } = useAppAuth();
 
   if (isLoading) {
     return (
@@ -38,11 +39,11 @@ function App() {
     <BrowserRouter>
       <Navbar />
       <Routes>
-        <Route path="/" element={isAuthenticated ? <Home /> : <LandingPage />} />///cazul in care clientul e logat va fi trimis la dashboard
+        <Route path="/" element={isUserLoggedIn ? <Home /> : <LandingPage />} />///cazul in care clientul e logat va fi trimis la dashboard
 
         <Route path="/home" element={<Home />} />
         <Route path="/about" element={<About />} />
-        <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/" />} />
+        <Route path="/profile" element={isUserLoggedIn ? <Profile /> : <Navigate to="/" />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>

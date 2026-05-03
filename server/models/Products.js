@@ -5,6 +5,7 @@ const productSchema = new mongoose.Schema({
  pret_lei: { type: Number, required: true },
  numar_valabil: { type: Number, required: true },
  adresa: { type: String, required: true },
+ image: {type: String}
 });
 const Product = mongoose.model('Product', productSchema);
 module.exports = Product;

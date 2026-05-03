@@ -1,7 +1,6 @@
 import React, { use } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import styles from './LandingPage.module.css';
-import heroImage from '../assets/images.jpg';
 
 function LandingPage() {
     const { loginWithRedirect } = useAuth0();
@@ -12,8 +11,8 @@ function LandingPage() {
                 <section className={styles.heroSplit}>
                     <div className={styles.heroTextSide}>
                         <h1 className={styles.heroTitle}>
-                            save food mate :P<br />
-                            <span className={styles.highlight}>join the loop</span>
+                            save food.<br />
+                            <span className={styles.highlight}>join the loop.</span>
                         </h1>
                         <p className={styles.heroSubtitle}>
                             help us reduce food waste and make a positive impact on the environment. <br />
@@ -29,7 +28,8 @@ function LandingPage() {
                     </div>
 
                     <div className={styles.heroImageSide}>
-                        <img className={styles.foodImage} src={heroImage} alt="Hero" />
+                        <img className={styles.foodImage} src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?q=80&w=1000&auto=format&fit=crop" 
+    alt="Mâncare proaspătă și sustenabilă" />
                     </div>
                 </section>
 

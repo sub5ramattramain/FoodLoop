@@ -1,25 +1,10 @@
 import React from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
 import styles from './Navbar.module.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useAppAuth } from './hooks/useAppAuth';
 
 function Navbar() {
-    const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
-    const navigate = useNavigate();
-
-    const localSessionString = localStorage.getItem('userSession');
-    const isLocalLoggedIn = !!localSessionString;
-    const isUserLoggedIn = isAuthenticated || isLocalLoggedIn;
-
-    const handleLogout = () => {
-        if (isAuthenticated) {
-            logout({ logoutParams: { returnTo: window.location.origin } });
-        } else if (isLocalLoggedIn) {
-            localStorage.removeItem('userSession');
-            navigate('/');
-            window.location.reload();
-        }
-    };
+    const { isUserLoggedIn, profilePicture, loginWithRedirect, handleLogout } = useAppAuth();
 
     return (
         <nav className={styles.navbar}>
@@ -29,9 +14,9 @@ function Navbar() {
 
             {!isUserLoggedIn && (
                 <div className={styles.navLinks}>
-                    <Link to="/" className={styles.link}>acasa</Link>
-                    <Link to="/about" className={styles.link}>cum funcționează</Link>
-                    <Link to="/" className={styles.link}>oferte</Link>
+                    <Link to="/" className={styles.link}>home</Link>
+                    <Link to="/about" className={styles.link}>about us</Link>
+                    <Link to="/" className={styles.link}>shop</Link>
                 </div>
             )}
 
@@ -48,8 +33,8 @@ function Navbar() {
                 ) : (
                     <div className={styles.userMenu}>
                         <Link to="/profile" className={styles.link}>Profil</Link>
-                        {user?.picture && (
-                            <img src={user.picture} alt="Profile" className={styles.profilePic} />
+                        {profilePicture && (
+                            <img src={profilePicture} alt="Profile" className={styles.profilePic} />
                         )}
                         <button className={styles.logoutBtn} onClick={handleLogout}>
                             Logout
