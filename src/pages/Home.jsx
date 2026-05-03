@@ -8,7 +8,7 @@ function Home() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if(!isUserLoggedIn) return;
+        if (!isUserLoggedIn) return;
         fetch('http://localhost:3000/api/products')
             .then(response => response.json())
             .then(data => {
@@ -35,28 +35,21 @@ function Home() {
                     ) : products.length === 0 ? (
                         <p>momentan nu exista oferte disponibile. incarca tu una.</p>
                     ) : (
-                        <div style={{ 
-                            display: 'grid', 
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-                            gap: '2rem' 
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                            gap: '2rem'
                         }}>
                             {products.map((product) => {
-                                const fullImageUrl = product.image 
-                                    ? `http://localhost:3000${product.image}` 
+                                const fullImageUrl = product.image
+                                    ? `http://localhost:3000${product.image}`
                                     : "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop";
 
                                 return (
-                                    <ProductCard 
-                                        key={product._id} 
-                                        title={product.produs} 
+                                    <ProductCard
+                                        key={product._id}
+                                        {...product}
                                         image={fullImageUrl}
-                                        distance={product.adresa} 
-                                        price={product.pret_lei}
-                                        discount={product.reducere} 
-                                        tags={product.tag} 
-                                        pickup={product.ridicare} 
-                                        orderWindow={product.comanda} 
-                                        isFree={product.pret_lei === 0}
                                     />
                                 );
                             })}
