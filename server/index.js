@@ -1,6 +1,26 @@
 const express = require('express');
 const app = express();
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); 
+const multer = require('multer'); 
+const path = require('path'); 
+const cors = require('cors');
+app.use(cors()); //pentru legare frontend si backend
+
+
+//pentru adaugarea de imagini
+const storage = multer.diskStorage({
+ destination: function (req, file, cb) {
+   cb(null, 'uploads/');
+ },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage: storage });
+app.use('/uploads' , express.static('uploads'));
+
+
+//Pentru MongoDB
 mongoose.connect('mongodb://localhost:27017/dashboard')
  .then(function() {
  console.log('Conectat la MongoDB!');
@@ -69,7 +89,7 @@ app.put('/api/products/:id', async function (req, res) {
 
 
 // adauga un produs nou
-app.post('/api/products', async function(req, res) {
+app.post('/api/products', upload.single('image'), async function(req, res) {
  try {
  const newProduct = new Products({
  produs: req.body.produs,
@@ -77,6 +97,7 @@ app.post('/api/products', async function(req, res) {
  pret_lei: req.body.pret_lei,
  numar_valabil: req.body.numar_valabil,
  adresa: req.body.adresa,
+ image: req.file ? `/uploads/${req.file.filename}` : ""
  });
  const saved = await newProduct.save();
  res.status(201).json(saved);
