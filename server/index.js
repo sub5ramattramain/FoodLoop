@@ -179,7 +179,9 @@ app.post('/api/products', upload.single('image'), async function(req, res) {
  tag: req.body.tag,
  reducere: req.body.reducere,
  ridicare: req.body.ridicare,
- comanda: req.body.comanda
+ comanda: req.body.comanda,
+ descriere: req.body.descriere,
+ ingrediente: req.body.ingrediente
  });
  const saved = await newProduct.save();
  res.status(201).json(saved);
