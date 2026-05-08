@@ -9,6 +9,30 @@ function Home() {
     const [isLoading, setIsLoading] = useState(true);
     const [filters, setFilters] = useState({});
 
+    const [userLocation, setUserLocation] = useState(null);
+    const [locationStatus, setLocationStatus] = useState('se cauta locatia...');
+
+    useEffect(() => {
+        if (!navigator.geolocation) {
+            setLocationStatus('geolocatia nu este suportata de acest browser');
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                setUserLocation({
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                });
+                setLocationStatus(null);
+            },
+            (error) => {
+                console.error("eroare la obtinerea locatiei:", error);
+                setLocationStatus('nu am putut obtine locatia, astfel, ofertele nu vor fi sortate dupa distanta');
+            }
+        );
+    }, []);
+
     useEffect(() => {
         if (!isUserLoggedIn) return;
 
@@ -19,6 +43,11 @@ function Home() {
         if (filters.minim_reducere) queryParams.append('minim_reducere', filters.minim_reducere);
         if (filters.ridicare) queryParams.append('ridicare', filters.ridicare);
         if (filters.tags) queryParams.append('tags', filters.tags); 
+        
+        if (userLocation) {
+            queryParams.append('lat', userLocation.lat);
+            queryParams.append('lng', userLocation.lng);
+        }
 
         const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
 
@@ -32,7 +61,7 @@ function Home() {
                 console.error('Error fetching products:', error);
                 setIsLoading(false);
             });
-    }, [isUserLoggedIn, filters]);
+    }, [isUserLoggedIn, filters, userLocation]);
 
     const handleFilterChange = (newFilters) => {
         setFilters(newFilters);
@@ -45,6 +74,7 @@ function Home() {
                     <div style={{ marginBottom: '2rem' }}>
                         <h2 style={{ color: 'var(--color-primary)' }}>salut, {displayName}.</h2>
                         <p style={{ color: '#666' }}>uite ce bunatati poti salva astazi in apropierea ta:</p>
+                        {locationStatus && <p style={{ color: '#ff9f43', fontSize: '0.9rem', marginTop: '0.5rem' }}>{locationStatus}</p>}
                     </div>
 
                     <Filters onFilterChange={handleFilterChange} />
@@ -69,6 +99,7 @@ function Home() {
                                         key={product._id}
                                         {...product}
                                         image={fullImageUrl}
+                                        distance={product.distance}
                                     />
                                 );
                             })}

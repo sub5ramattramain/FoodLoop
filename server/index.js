@@ -92,7 +92,7 @@ app.get('/api/products', async function(req, res) {
       query.produs = { $regex: req.query.nume, $options: 'i' }; //cauta dupa nume
     }
 
- const products = await Products.find(query);
+  let products = await Products.find(query);
 
   if(req.query.lat && req.query.lng){               //cod pentru calcularea distantei, clientul trebuie sa trimita lat si lng
     const userLat = Number(req.query.lat);

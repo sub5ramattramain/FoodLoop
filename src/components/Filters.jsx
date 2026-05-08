@@ -46,6 +46,10 @@ function Filters({ onFilterChange }) {
                     <option value="dulce">dulce</option>
                     <option value="mancare gatita">mancare gatita</option>
                     <option value="brutarie">brutarie</option>
+                    <option value="veggie">veggie</option>
+                    <option value="desert">desert</option>
+                    <option value="fast-food">fast-food</option>
+                    <option value="cald">cald</option>
                 </select>
 
                 <select value={minDiscount} onChange={handleDiscountChange} className={styles.select}>
