@@ -47,6 +47,12 @@ function ProductCard({ image, magazin, produs, adresa, pret_lei, reducere, numar
                 )}
 
                 <div className={styles.details}>
+                    {distance !== undefined &&  distance !== null && distance !== Infinity && (
+                        <div className={styles.detailRow}>
+                            <span className={styles.icon}>🚶</span>
+                            <span className={styles.detailText}>distanta: <strong>{distance.toFixed(1)} km</strong></span>
+                        </div>
+                    )}
                     {comanda && (
                         <div className={styles.detailRow}>
                             <span className={styles.icon}>🛒</span>
