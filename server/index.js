@@ -56,7 +56,7 @@ mongoose.connect('mongodb://localhost:27017/dashboard')
  .catch(function(err) {
  console.error('Eroare conectare MongoDB:', err);
  });
-
+ const Favorite = require('./models/Favorites');
  const Products = require('./models/Products');
 const PORT = 3000;
 
@@ -92,7 +92,7 @@ app.get('/api/products', async function(req, res) {
       query.produs = { $regex: req.query.nume, $options: 'i' }; //cauta dupa nume
     }
 
-  let products = await Products.find(query);
+ let products = await Products.find(query);
 
   if(req.query.lat && req.query.lng){               //cod pentru calcularea distantei, clientul trebuie sa trimita lat si lng
     const userLat = Number(req.query.lat);
@@ -119,7 +119,7 @@ app.get('/api/products', async function(req, res) {
  }
 });
 
-
+//cod pentru a lista baza de date
 app.get('/api/products/:id', async function (req, res) {
   try {
     // asta e functia de actualizare get
@@ -179,7 +179,9 @@ app.post('/api/products', upload.single('image'), async function(req, res) {
  tag: req.body.tag,
  reducere: req.body.reducere,
  ridicare: req.body.ridicare,
- comanda: req.body.comanda
+ comanda: req.body.comanda,
+ descriere: req.body.descriere,
+ ingrediente: req.body.ingrediente
  });
  const saved = await newProduct.save();
  res.status(201).json(saved);
@@ -189,7 +191,7 @@ app.post('/api/products', upload.single('image'), async function(req, res) {
 });
 
 
-//Functie delete
+//Functie delete pentru baza de date
 app.delete('/api/products/:id', async function (req, res) {
   try {
     const deletedProduct = await Products.findByIdAndDelete(req.params.id);
@@ -200,9 +202,55 @@ app.delete('/api/products/:id', async function (req, res) {
 
     res.json({ message: 'Deleted' });
   } catch (err) {
-    res.status(500).json({ error: 'Eroare la ștergere: ' + err.message });
+    res.status(400).json({ error: 'Eroare la ștergere: ' + err.message });
   }
 });
+
+
+//cod pentru a adauga in lista de favorite; se trimite userId si numele magazinului
+app.post('/api/favourites', async function (req, res) {
+  try {
+    const { userId, storeName } = req.body;
+    const newFav = new Favorite({ userId, storeName }); //am facut model nou pentru favorite in baza de date
+    await newFav.save();
+    res.status(201).json({ message: 'Adaugat in lista de produse favorite' });
+  } catch (err) {
+    res.status(400).json({ error: 'Eroare la adaugarea in lista de produse favorite: ' + err.message });
+  }
+});
+
+//cod pentru a lista favoritele si este obligatoriu sa se puna un id in link
+app.get('/api/favourites/:userId', async function (req, res) {
+  try {
+    const favorites = await Favorite.find({userId: req.params.userId});
+
+    let storeName = favorites.map(fav => fav.storeName);
+
+    let favoriteProducts = await Products.find({
+       magazin: { $in: storeName } 
+    });
+    
+    res.json(favoriteProducts);
+
+  } catch (err) {
+    res.status(400).json({ error: 'Eroare la incarcarea listei de produse favorite: ' + err.message });
+  }
+});
+
+//cod pentru a sterge din lista de favorite
+app.delete('/api/favourites', async function (req, res) {
+  try {
+    const {userId, storeName} = req.query;
+    await Favorite.findOneAndDelete({ userId, storeName });
+    res.json({ message: 'Șters din lista de produse favorite' });
+  } catch (err) {
+    res.status(400).json({ error: 'Eroare la ștergerea din lista de produse favorite: ' + err.message });
+  }
+
+});
+
+
+
 
 
 

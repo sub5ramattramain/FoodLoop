@@ -11,7 +11,9 @@ const productSchema = new mongoose.Schema({
  reducere: {type : Number, default: 0}, //o sa fie procentaj
  tag: {type: String}, //sub forma de "Tag1,Tag2,Tag3" pentru a putea cauta dupa taguri
  ridicare: {type: String}, // cand va ridica: dimineata, pranz, seara
- comanda: {type: String} //sub forma de 8:00-16:00 pentru a vedea cand se poate plasa comanda
+ comanda: {type: String}, //sub forma de 8:00-16:00 pentru a vedea cand se poate plasa comanda
+ descriere: {type: String}, //pentru pagina produsului
+ ingrediente: {type: String} //pentru pagina produsului
 });
 const Product = mongoose.model('Product', productSchema);
 module.exports = Product;
