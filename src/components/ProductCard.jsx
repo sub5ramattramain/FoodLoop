@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './ProductCard.module.css';
 
-function ProductCard({ image, magazin, produs, adresa, pret_lei, reducere, numar_valabil, tag, ridicare, comanda, isUserLoggedIn }) {
+function ProductCard({ image, magazin, produs, adresa, pret_lei, reducere, numar_valabil, tag, ridicare, comanda, isUserLoggedIn, distance }) {
 
     const isFree = pret_lei === 0;
     const oldPrice = reducere > 0 ? (pret_lei / (1 - reducere / 100)).toFixed(2) : null;
