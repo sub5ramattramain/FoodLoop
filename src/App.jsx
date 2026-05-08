@@ -41,6 +41,7 @@ function App() {
       <Routes>
         <Route path="/" element={isUserLoggedIn ? <Home /> : <LandingPage />} />///cazul in care clientul e logat va fi trimis la dashboard
 
+        <Route path = "/shop" element ={<Home/>}></Route>
         <Route path="/home" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={isUserLoggedIn ? <Profile /> : <Navigate to="/" />} />

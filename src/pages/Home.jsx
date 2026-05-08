@@ -10,7 +10,6 @@ function Home() {
     const [filters, setFilters] = useState({});
 
     useEffect(() => {
-        if (!isUserLoggedIn) return;
 
         setIsLoading(true);
 
@@ -32,7 +31,7 @@ function Home() {
                 console.error('Error fetching products:', error);
                 setIsLoading(false);
             });
-    }, [isUserLoggedIn, filters]);
+    }, [filters]);
 
     const handleFilterChange = (newFilters) => {
         setFilters(newFilters);
@@ -41,11 +40,11 @@ function Home() {
     return (
         <div style={{ padding: '2rem 4rem', backgroundColor: '#f9fafb', minHeight: '100vh' }}>
             {isUserLoggedIn && (
-                <>
                     <div style={{ marginBottom: '2rem' }}>
                         <h2 style={{ color: 'var(--color-primary)' }}>salut, {displayName}.</h2>
                         <p style={{ color: '#666' }}>uite ce bunatati poti salva astazi in apropierea ta:</p>
                     </div>
+            )}
 
                     <Filters onFilterChange={handleFilterChange} />
 
@@ -69,13 +68,13 @@ function Home() {
                                         key={product._id}
                                         {...product}
                                         image={fullImageUrl}
+                                        isUserLoggedIn={isUserLoggedIn}
                                     />
                                 );
                             })}
                         </div>
                     )}
-                </>
-            )}
+            
         </div>
     );
 }
