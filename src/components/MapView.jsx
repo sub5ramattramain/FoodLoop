@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState , useMemo} from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+
 
 const DefaultIcon = L.icon({
     iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
@@ -12,11 +13,19 @@ const DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 function MapView({ products, userLocation }) {
-    const groupedProducts = {};
-    products.forEach(p => {
-        if (p.lat && p.lng && p.lat !== 0 && p.lng !== 0) {
-            const key = `${p.lat},${p.lng}`;
-            if (!groupedProducts[key]) {
+    const [radius , setRadius]=useState(500);
+    const filteredGroupProducts=useMemo( () =>{
+        if(!userLocation)
+              return{};
+        const groupedProducts = {};
+        const userLatLng= L.latLng(userLocation.lat , userLocation.lng);
+        products.forEach(p => {
+            if (p.lat && p.lng && p.lat !== 0 && p.lng !== 0){
+                const productLatLng=L.latLng(p.lat , p.lng);
+                const distance=userLatLng.distanceTo(productLatLng);
+                if(distance<=radius){
+                const key = `${p.lat},${p.lng}`;
+                 if (!groupedProducts[key]) {
                 groupedProducts[key] = {
                     lat: p.lat,
                     lng: p.lng,
@@ -25,12 +34,25 @@ function MapView({ products, userLocation }) {
                 };
             }
             groupedProducts[key].oferte.push(p);
-        }
+      }
+    }
     });
+      return groupedProducts;
+    }, [products ,userLocation , radius]);
+    
+    
 
     const mapCenter = userLocation ? [userLocation.lat, userLocation.lng] : [45.6427, 25.5887]; ///centrul hartii va fi brasov
 
     return (
+    <div style={{position: 'relative'}}>
+        <div style={{ position: 'absolute' , top:'10px', right:'10px', zIndex:1000, background:'white'}}>
+          <label>Raza: {radius/1000} km</label>
+             <input type="range" min="500" max="20000" step="500"
+               value={radius} 
+               onChange={(e) => setRadius(parseInt(e.target.value))}
+             />
+        </div>
         <div style={{ height: '600px', width: '100%', borderRadius: '12px', overflow: 'hidden', border: '1px solid #ddd', marginTop: '1rem', zIndex: 0 }}>
             <MapContainer center={mapCenter} zoom={14} style={{ height: '100%', width: '100%', zIndex: 1 }}>
                 <TileLayer
@@ -42,8 +64,9 @@ function MapView({ products, userLocation }) {
                 {userLocation && (
                     <>
                         <Circle
+                           
                             center={[userLocation.lat, userLocation.lng]}
-                            radius={2000}
+                            radius={radius}
                             pathOptions={{ color: '#004734', fillColor: '#004734', fillOpacity: 0.1 }}
                         />
                         <Marker position={[userLocation.lat, userLocation.lng]}>
@@ -53,7 +76,7 @@ function MapView({ products, userLocation }) {
                 )}
 
                 {/*pinurile magazinelor*/}
-                {Object.values(groupedProducts).map((g, idx) => (
+                {Object.values(filteredGroupProducts).map((g, idx) => (
                     <Marker key={idx} position={[g.lat, g.lng]}>
                         <Popup>
                             <div style={{ textAlign: 'center', minWidth: '150px' }}>
@@ -69,12 +92,21 @@ function MapView({ products, userLocation }) {
                                         </li>
                                     ))}
                                 </ul>
+                                <a 
+                                   href={`https://www.google.com/maps/search/?api=1&query=${g.lat},${g.lng}`}
+                                   target ="_blank"
+                                   rel = " noopener noreferrer"
+                                   style={{ textAlign: 'center' , color: '#004734', fontSize: '1rem'  }}
+                                   >
+                                     <p>Vezi pe Maps</p> 
+                                   </a>
                             </div>
                         </Popup>
                     </Marker>
                 ))}
             </MapContainer>
         </div>
+    </div>
     );
 }
 
