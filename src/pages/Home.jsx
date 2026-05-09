@@ -62,7 +62,7 @@ function Home() {
                 console.error('Error fetching products:', error);
                 setIsLoading(false);
             });
-    }, [isUserLoggedIn, filters, userLocation]);
+    }, [filters, userLocation]);
 
     const handleFilterChange = (newFilters) => {
         setFilters(newFilters);
@@ -127,12 +127,12 @@ function Home() {
                                 {...product}
                                 image={fullImageUrl}
                                 distance={product.distance}
+                                isUserLoggedIn={isUserLoggedIn}
                             />
                         );
                     })}
                 </div>
             )}
-
         </div>
     );
 }
