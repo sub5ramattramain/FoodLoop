@@ -71,68 +71,68 @@ function Home() {
     return (
         <div style={{ padding: '2rem 4rem', backgroundColor: '#f9fafb', minHeight: '100vh' }}>
             {isUserLoggedIn && (
-                    <div style={{ marginBottom: '2rem' }}>
-                        <h2 style={{ color: 'var(--color-primary)' }}>salut, {displayName}.</h2>
-                        <p style={{ color: '#666' }}>uite ce bunatati poti salva astazi in apropierea ta:</p>
-                        {locationStatus && <p style={{ color: '#ff9f43', fontSize: '0.9rem', marginTop: '0.5rem' }}>{locationStatus}</p>}
-                    </div>
+                <div style={{ marginBottom: '2rem' }}>
+                    <h2 style={{ color: 'var(--color-primary)' }}>salut, {displayName}.</h2>
+                    <p style={{ color: '#666' }}>uite ce bunatati poti salva astazi in apropierea ta:</p>
+                    {locationStatus && <p style={{ color: '#ff9f43', fontSize: '0.9rem', marginTop: '0.5rem' }}>{locationStatus}</p>}
+                </div>
             )}
 
-                    <Filters onFilterChange={handleFilterChange} />
+            <Filters onFilterChange={handleFilterChange} />
 
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', marginTop: '1rem' }}>
-                        <button
-                            onClick={() => setViewMode('list')}
-                            style={{
-                                padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none',
-                                backgroundColor: viewMode === 'list' ? 'var(--color-primary)' : '#e5e7eb',
-                                color: viewMode === 'list' ? 'white' : '#4b5563',
-                                cursor: 'pointer', fontWeight: 'bold', transition: '0.2s'
-                            }}
-                        >vezi lista</button>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', marginTop: '1rem' }}>
+                <button
+                    onClick={() => setViewMode('list')}
+                    style={{
+                        padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none',
+                        backgroundColor: viewMode === 'list' ? 'var(--color-primary)' : '#e5e7eb',
+                        color: viewMode === 'list' ? 'white' : '#4b5563',
+                        cursor: 'pointer', fontWeight: 'bold', transition: '0.2s'
+                    }}
+                >vezi lista</button>
 
-                        <button
-                            onClick={() => setViewMode('map')}
-                            style={{
-                                padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none',
-                                backgroundColor: viewMode === 'map' ? 'var(--color-primary)' : '#e5e7eb',
-                                color: viewMode === 'map' ? 'white' : '#4b5563',
-                                cursor: 'pointer', fontWeight: 'bold', transition: '0.2s'
-                            }}
-                        >
-                            vezi harta
-                        </button>
-                    </div>
+                <button
+                    onClick={() => setViewMode('map')}
+                    style={{
+                        padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none',
+                        backgroundColor: viewMode === 'map' ? 'var(--color-primary)' : '#e5e7eb',
+                        color: viewMode === 'map' ? 'white' : '#4b5563',
+                        cursor: 'pointer', fontWeight: 'bold', transition: '0.2s'
+                    }}
+                >
+                    vezi harta
+                </button>
+            </div>
 
-                    {isLoading ? (
-                        <p>se incarca ofertele..</p>
-                    ) : products.length === 0 ? (
-                        <p>momentan nu exista oferte disponibile. incarca tu una.</p>
-                    ) : viewMode === 'map' ? (
-                        <MapView products={products} userLocation={userLocation} />
-                    ) : (
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                            gap: '2rem'
-                        }}>
-                            {products.map((product) => {
-                                const fullImageUrl = product.image
-                                    ? `http://localhost:3000${product.image}`
-                                    : "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop";
+            {isLoading ? (
+                <p>se incarca ofertele..</p>
+            ) : products.length === 0 ? (
+                <p>momentan nu exista oferte disponibile. incarca tu una.</p>
+            ) : viewMode === 'map' ? (
+                <MapView products={products} userLocation={userLocation} />
+            ) : (
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                    gap: '2rem'
+                }}>
+                    {products.map((product) => {
+                        const fullImageUrl = product.image
+                            ? `http://localhost:3000${product.image}`
+                            : "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop";
 
-                                return (
-                                    <ProductCard
-                                        key={product._id}
-                                        {...product}
-                                        image={fullImageUrl}
-                                        distance={product.distance}
-                                    />
-                                );
-                            })}
-                        </div>
-                    )}
-            
+                        return (
+                            <ProductCard
+                                key={product._id}
+                                {...product}
+                                image={fullImageUrl}
+                                distance={product.distance}
+                            />
+                        );
+                    })}
+                </div>
+            )}
+
         </div>
     );
 }

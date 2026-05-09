@@ -6,7 +6,7 @@ function LandingPage() {
     const { loginWithRedirect } = useAuth0();
 
     return (
-        <>  
+        <>
             <div className={styles.landingWrapper}>
                 <section className={styles.heroSplit}>
                     <div className={styles.heroTextSide}>
@@ -28,8 +28,8 @@ function LandingPage() {
                     </div>
 
                     <div className={styles.heroImageSide}>
-                        <img className={styles.foodImage} src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?q=80&w=1000&auto=format&fit=crop" 
-    alt="Mâncare proaspătă și sustenabilă" />
+                        <img className={styles.foodImage} src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?q=80&w=1000&auto=format&fit=crop"
+                            alt="Mâncare proaspătă și sustenabilă" />
                     </div>
                 </section>
 

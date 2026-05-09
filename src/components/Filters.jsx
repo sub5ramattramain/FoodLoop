@@ -29,14 +29,14 @@ function Filters({ onFilterChange }) {
 
     return (
         <div className={styles.filtersContainer}>
-            <input 
-                type="text" 
-                placeholder="cauta oferte..." 
+            <input
+                type="text"
+                placeholder="cauta oferte..."
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className={styles.searchInput}
             />
-            
+
             <div className={styles.selectGroup}>
                 <select value={selectedTag} onChange={handleTagChange} className={styles.select}>
                     <option value="">toate categoriile</option>

@@ -34,12 +34,12 @@ function Navbar() {
                 ) : (
                     <div className={styles.userMenu}>
                         <Link to="/profile" className={styles.link}>Profil</Link>
-                        
+
                         {profilePicture && !imgError ? (
-                            <img 
-                                src={profilePicture} 
-                                alt="Profile" 
-                                className={styles.profilePic} 
+                            <img
+                                src={profilePicture}
+                                alt="Profile"
+                                className={styles.profilePic}
                                 onError={() => setImgError(true)}
                             />
                         ) : (

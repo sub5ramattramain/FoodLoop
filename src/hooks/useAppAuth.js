@@ -12,6 +12,8 @@ export function useAppAuth() {
     const displayName = user?.given_name || user?.name || localSession?.email || 'User';
     const profilePicture = user?.picture || null;
 
+    const userId= user?.sub || localSession?.email;
+
     const handleLogout = () => {
         if (isAuthenticated) {
             logout({ logoutParams: { returnTo: window.location.origin } });
@@ -28,6 +30,7 @@ export function useAppAuth() {
         isUserLoggedIn,
         displayName,
         profilePicture,
+        userId,
         handleLogout,
         loginWithRedirect,
         isLoading
