@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './Navbar.module.css';
 import { Link } from 'react-router-dom';
 import { useAppAuth } from '../hooks/useAppAuth';
 
 function Navbar() {
-    const { isUserLoggedIn, profilePicture, loginWithRedirect, handleLogout } = useAppAuth();
+    const { isUserLoggedIn, displayName, profilePicture, loginWithRedirect, handleLogout } = useAppAuth();
+    const [imgError, setImgError] = useState(false);
 
     return (
         <nav className={styles.navbar}>
@@ -16,7 +17,7 @@ function Navbar() {
                 <div className={styles.navLinks}>
                     <Link to="/" className={styles.link}>home</Link>
                     <Link to="/about" className={styles.link}>about us</Link>
-                    <Link to="/" className={styles.link}>shop</Link>
+                    <Link to="/shop" className={styles.link}>shop</Link>
                 </div>
             )}
 
@@ -33,9 +34,20 @@ function Navbar() {
                 ) : (
                     <div className={styles.userMenu}>
                         <Link to="/profile" className={styles.link}>Profil</Link>
-                        {profilePicture && (
-                            <img src={profilePicture} alt="Profile" className={styles.profilePic} />
+
+                        {profilePicture && !imgError ? (
+                            <img
+                                src={profilePicture}
+                                alt="Profile"
+                                className={styles.profilePic}
+                                onError={() => setImgError(true)}
+                            />
+                        ) : (
+                            <div className={styles.profileFallback}>
+                                {displayName ? displayName.charAt(0).toUpperCase() : 'U'}
+                            </div>
                         )}
+
                         <button className={styles.logoutBtn} onClick={handleLogout}>
                             Logout
                         </button>
