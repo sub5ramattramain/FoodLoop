@@ -88,6 +88,7 @@
 
 .btnSecondary:hover {
     background-color: rgba(0, 71, 52, 0.05);
+    transform: translateY(-2px)
 }
 
 .foodImage {
