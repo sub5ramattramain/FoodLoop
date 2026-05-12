@@ -49,7 +49,7 @@ function LandingPage() {
                         className={styles.foodImage}
                         src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?q=80&w=800&auto=format&fit=crop"
                         alt="mancare proaspata si sustenabila"
-                        fetchpriority="high"
+                        fetchPriority="high"
                     />
                 </div>
             </section>
