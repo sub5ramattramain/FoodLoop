@@ -56,6 +56,7 @@ mongoose.connect('mongodb://localhost:27017/dashboard')
  .catch(function(err) {
  console.error('Eroare conectare MongoDB:', err);
  });
+ const Shop = require('./models/Shop');
  const Favorite = require('./models/Favorites');
  const Products = require('./models/Products');
 const PORT = 3000;
@@ -250,7 +251,36 @@ app.delete('/api/favourites', async function (req, res) {
 });
 
 
+//cod pentru pagina de shop, adaugare magazin nou daca nu exista deja si afisarea tuturor produselor din magazinul respectiv
+//si afisarea imaginii magazinului si a produselor din magazinul respectiv
+app.post('/api/shop', upload.single('image'), async function (req, res) {
+try {
+  const { numeMagazin, adresa } = req.body;
+  const existingShop = await Shop.findOne({ numeMagazin });
+  if (!existingShop) {
+    const imagineMagazin = req.file ? `/uploads/${req.file.filename}` : "";
+    const newShop = new Shop({ numeMagazin, adresa, image: imagineMagazin });
+    await newShop.save();
+  }
+    res.status(201).json({ message: 'Adaugat in lista de Magazine' });
+  } catch (err) {
+    res.status(400).json({ error: 'Eroare la adaugarea in lista de Magazine: ' + err.message });
+  }
+});
 
+app.get('/api/shop/:numeMagazin', async function (req, res) {
+ const numeMagazin = req.params.numeMagazin;
+ try {
+   const shop = await Shop.findOne({ numeMagazin });
+   if (!shop) {
+     return res.status(404).json({ error: 'Magazinul nu a fost găsit' });
+   }
+   const products = await Products.find({ magazin: numeMagazin });
+   res.json({ shop, products });
+ } catch (err) {
+   res.status(400).json({ error: 'Eroare la încărcarea magazinului și produselor: ' + err.message });
+ }
+});
 
 
 
