@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useAppAuth } from '../hooks/useAppAuth';
 
 function SellerProfile() {
-  const { isUserLoggedIn, displayName, profilePicture } = useAppAuth();
+  const { isUserLoggedIn, displayName, profilePicture, userId } = useAppAuth();
+
+  const [storeStatus, setStoreStatus] = useState('loading');
+  const [storeSetupData, setStoreSetupData] = useState({ nume: displayName || '', adresa: '' });
+  const [storeLogo, setStoreLogo] = useState(null);
 
   const [statusMessage, setStatusMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -27,21 +31,77 @@ function SellerProfile() {
   const [imageFile, setImageFile] = useState(null);
 
   useEffect(() => {
-    if (isUserLoggedIn && displayName) {
-      fetchMyOffers();
+    if (isUserLoggedIn && userId) {
+      checkStoreStatus();
     }
-  }, [isUserLoggedIn, displayName]);
+  }, [isUserLoggedIn, userId]);
 
-  const fetchMyOffers = async () => {
+  const checkStoreStatus = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/shop/${displayName}`);
+      if (response.ok) {
+        const data = await response.json();
+        const magazinName = data.shop.numeMagazin;
+        const magazinAdresa = data.shop.adresa;
+
+        setFormData(prev => ({ ...prev, magazin: magazinName, adresa: magazinAdresa }));
+        setStoreStatus('ready');
+        fetchMyOffers(magazinName);
+      } else {
+        setStoreStatus('needs setup');
+      }
+    } catch (error) {
+      console.error(error);
+      setStoreStatus('needs setup');
+    }
+  };
+
+  const fetchMyOffers = async (storeName) => {
     try {
       const response = await fetch('http://localhost:3000/api/products');
       if (response.ok) {
         const data = await response.json();
-        const filtered = data.filter(p => p.magazin && p.magazin.toLowerCase() === displayName.toLowerCase());
+        const filtered = data.filter(p => p.magazin && p.magazin.toLowerCase() === (storeName || displayName).toLowerCase());
         setMyOffers(filtered);
       }
     } catch (error) {
+      console.error(error);
       setStatusMessage('a aparut o eroare la incarcarea ofertelor.');
+    }
+  };
+
+  const handleStoreSetupChange = (e) => {
+    const { name, value } = e.target;
+    setStoreSetupData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleStoreSetupSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const data = new FormData();
+      data.append('numeMagazin', storeSetupData.nume);
+      data.append('adresa', storeSetupData.adresa);
+      if (storeLogo) data.append('image', storeLogo);
+
+      const response = await fetch('http://localhost:3000/api/shop', {
+        method: 'POST',
+        body: data
+      });
+
+      if (response.ok) {
+        setFormData(prev => ({ ...prev, magazin: storeSetupData.nume, adresa: storeSetupData.adresa }));
+        setStoreStatus('ready');
+        fetchMyOffers(storeSetupData.nume);
+      } else {
+        const errData = await response.json().catch(() => null);
+        alert(`Eroare backend: ${errData?.error || response.statusText}`);
+      }
+    } catch (error) {
+      alert('eroare de retea. asigura-te ca serverul functioneaza.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -60,7 +120,6 @@ function SellerProfile() {
     e.preventDefault();
     setIsLoading(true);
     setStatusMessage(editId ? 'se actualizeaza oferta...' : 'se incarca oferta...');
-    formData.magazin = displayName;
 
     try {
       let response;
@@ -89,14 +148,16 @@ function SellerProfile() {
 
       if (response.ok) {
         setStatusMessage(editId ? 'oferta a fost actualizata!' : 'oferta a fost publicata cu succes!');
+        const savedMagazin = formData.magazin;
+        const savedAdresa = formData.adresa;
         setFormData({
-          produs: '', magazin: '', pret_lei: '', numar_valabil: '',
-          adresa: '', tag: '', reducere: '', ridicare: '', comanda: '', descriere: '', ingrediente: ''
+          produs: '', magazin: savedMagazin, pret_lei: '', numar_valabil: '',
+          adresa: savedAdresa, tag: '', reducere: '', ridicare: '', comanda: '', descriere: '', ingrediente: ''
         });
         setImageFile(null);
         setEditId(null);
         e.target.reset();
-        fetchMyOffers();
+        fetchMyOffers(savedMagazin);
       } else {
         const errData = await response.json();
         setStatusMessage(`eroare: ${errData.error}`);
@@ -136,7 +197,7 @@ function SellerProfile() {
         method: 'DELETE'
       });
       if (response.ok) {
-        fetchMyOffers();
+        fetchMyOffers(formData.magazin);
         setStatusMessage('oferta a fost stearsa.');
       }
     } catch (error) {
@@ -146,10 +207,11 @@ function SellerProfile() {
 
   const handleCancelEdit = () => {
     setEditId(null);
-    setFormData({
-      produs: '', magazin: '', pret_lei: '', numar_valabil: '',
-      adresa: '', tag: '', reducere: '', ridicare: '', comanda: '', descriere: '', ingrediente: ''
-    });
+    setFormData(prev => ({
+      ...prev,
+      produs: '', pret_lei: '', numar_valabil: '',
+      tag: '', reducere: '', ridicare: '', comanda: '', descriere: '', ingrediente: ''
+    }));
     setStatusMessage('');
   };
 
@@ -161,25 +223,61 @@ function SellerProfile() {
     );
   }
 
+  if (storeStatus === 'loading') {
+    return (
+      <div style={{ padding: '5rem', textAlign: 'center', minHeight: '100vh', backgroundColor: '#f9fafb' }}>
+        <h2 style={{ color: 'var(--color-primary)' }}>se incarca datele magazinului...</h2>
+      </div>
+    );
+  }
+
+  if (storeStatus === 'needs setup') {
+    return (
+      <div style={{ padding: '2rem 4rem', backgroundColor: '#f9fafb', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ backgroundColor: 'white', padding: '3rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '600px' }}>
+          <h2 style={{ color: 'var(--color-primary)', textAlign: 'center', marginBottom: '1rem' }}>bine ai venit in foodloop.</h2>
+          <p style={{ color: '#666', textAlign: 'center', marginBottom: '2rem' }}>inainte sa poti posta oferte, te rugam sa inregistrezi detaliile magazinului tau. acest pas se face o singura data.</p>
+
+          <form onSubmit={handleStoreSetupSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontWeight: 'bold', color: '#374151' }}>nume magazin / locatie *</label>
+              <input type="text" name="nume" value={storeSetupData.nume} onChange={handleStoreSetupChange} required style={{ padding: '1rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontWeight: 'bold', color: '#374151' }}>adresa fizica completa *</label>
+              <input type="text" name="adresa" value={storeSetupData.adresa} onChange={handleStoreSetupChange} required placeholder="strada, numar, oras" style={{ padding: '1rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontWeight: 'bold', color: '#374151' }}>logo magazin (optional)</label>
+              <input type="file" accept="image/*" onChange={(e) => setStoreLogo(e.target.files[0])} style={{ padding: '0.5rem 0' }} />
+            </div>
+            <button type="submit" disabled={isLoading} style={{ marginTop: '1rem', padding: '1rem', backgroundColor: isLoading ? '#9ca3af' : 'var(--color-primary)', color: 'white', fontWeight: 'bold', borderRadius: '8px', border: 'none', cursor: isLoading ? 'not-allowed' : 'pointer', fontSize: '1.1rem' }}>
+              {isLoading ? 'se inregistreaza...' : 'inregistreaza magazinul'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: '2rem 4rem', backgroundColor: '#f9fafb', minHeight: '100vh', display: 'flex', flexDirection: 'column', gap: '3rem' }}>
-
       <div style={{ display: 'flex', gap: '3rem' }}>
         <div style={{ width: '300px', backgroundColor: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', height: 'fit-content' }}>
           <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
             {profilePicture && !imgError ? (
-              <img 
-                src={profilePicture} 
-                alt="profil" 
+              <img
+                src={profilePicture}
+                alt="profil"
                 onError={() => setImgError(true)}
-                style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--color-primary)' }} 
+                style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--color-primary)' }}
               />
             ) : (
               <div style={{ width: '100px', height: '100px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', fontWeight: 'bold', margin: '0 auto' }}>
                 {displayName ? displayName.charAt(0).toUpperCase() : 'U'}
               </div>
             )}
-            <h2 style={{ color: 'var(--color-primary)', marginTop: '1rem', marginBottom: '0.2rem' }}>{displayName}</h2>
+            <h2 style={{ color: 'var(--color-primary)', marginTop: '1rem', marginBottom: '0.2rem' }}>{formData.magazin}</h2>
             <p style={{ color: '#666', fontSize: '0.9rem' }}>partener foodloop</p>
           </div>
         </div>
@@ -195,14 +293,13 @@ function SellerProfile() {
           )}
 
           <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 'bold', color: '#374151' }}>nume produs / pachet *</label>
               <input type="text" name="produs" value={formData.produs} onChange={handleChange} required style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 'bold', color: '#374151' }}>nume magazin *</label>
-              <input type="text" name="magazin" value={displayName || ''} readOnly style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db', backgroundColor: '#f3f4f6', color: '#6b7280', cursor: 'not-allowed' }} />
+              <input type="text" name="magazin" value={formData.magazin || ''} readOnly style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db', backgroundColor: '#f3f4f6', color: '#6b7280', cursor: 'not-allowed' }} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

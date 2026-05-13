@@ -4,9 +4,15 @@ import SellerProfile from '../components/SellerProfile';
 import CustomerProfile from '../components/CustomerProfile';
 
 function Profile() {
-  const { isUserLoggedIn } = useAppAuth();
+  const { isUserLoggedIn, userRole, isLoading } = useAppAuth();
 
-  const [isSellerView, setIsSellerView] = useState(false);
+  if (isLoading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb' }}>
+        <h2 style={{ color: 'var(--color-primary)' }}>se incarca profilul...</h2>
+      </div>
+    )
+  }
 
   if (!isUserLoggedIn) {
     return (
@@ -17,14 +23,8 @@ function Profile() {
   }
 
   return (
-    <div style={{ padding: '2rem 4rem', backgroundColor: '#f9fafb', minHeight: '100vh'}}>
-      <button
-        onClick={() => setIsSellerView(!isSellerView)}
-        style={{ marginBottom: '2rem', padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '20px', border: '1px solid var(--color-primary)', backgroundColor: 'transparent', color: 'var(--color-primary)', fontWeight: 'bold'}}
-      >switch to {isSellerView ? 'customer profile' : 'seller profile'} (test)
-      </button>
-
-      {isSellerView ? (
+    <div style={{ padding: '0', backgroundColor: '#f9fafb', minHeight: '100vh' }}>
+      {userRole?.toLowerCase() === 'vanzator' ? (
         <SellerProfile />
       ) : (
         <CustomerProfile />
