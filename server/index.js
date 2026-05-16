@@ -59,6 +59,7 @@ mongoose.connect('mongodb://localhost:27017/dashboard')
  const Shop = require('./models/Shop');
  const Favorite = require('./models/Favorites');
  const Products = require('./models/Products');
+ const Review = require('./models/Review');
 const PORT = 3000;
 
 app.use(express.json());
@@ -280,6 +281,48 @@ app.get('/api/shop/:numeMagazin', async function (req, res) {
  } catch (err) {
    res.status(400).json({ error: 'Eroare la încărcarea magazinului și produselor: ' + err.message });
  }
+});
+
+//Get reviews
+app.get('/api/products/:productId/reviews', async function (req, res) {
+	try {
+	  	const reviews = await Review.find({ id_produs: req.params.id_produs});
+		  res.json(reviews);
+	} catch (err) {
+		  res.status(500).json({ error: 'Eroare la getter review-uri: ' + err });
+	}
+
+});
+
+//Post review
+app.post('/api/products/:productId/reviews', async function (req, res) {
+	try {
+		  const newReview = new Review({
+        id_produs: req.body.id_produs,
+		    nume: req.body.nume,
+	  		rating: req.body.rating,
+	  		text: req.body.text,
+	  	});
+		  const saved = await newReview.save();
+	  	res.status(201).json(saved);
+	} catch (err) {
+	  	res.status(400).json({ error: 'Eroare la postarea review-ului: ' + err.message });
+	}
+});
+
+//Delete review
+app.delete('/api/products/:productId/reviews/:id', async function (req, res) {
+	try {
+		  const deletereview = await Review.findOneAndDelete({
+        _id: req.params.id,
+        id_produs: req.params.id_produs,
+      });
+      if (!deletereview) return res.status(404).json({ error: 'Review-ul nu a fost gasit' });
+	  	res.json({ message: 'Deleted' });
+	} catch (err) {
+	  	res.status(404).json({ error: 'Eroare la stergerea review-ului: ' + err });
+	}
+
 });
 
 
