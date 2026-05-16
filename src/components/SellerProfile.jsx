@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAppAuth } from '../hooks/useAppAuth';
 import toast from 'react-hot-toast';
+import { useLocation } from 'react-router-dom';
 
 function SellerProfile() {
   const { isUserLoggedIn, displayName, profilePicture, userId } = useAppAuth();
+  const location = useLocation();
 
   const [storeStatus, setStoreStatus] = useState('loading');
   const [storeSetupData, setStoreSetupData] = useState({ nume: displayName || '', adresa: '' });
@@ -14,6 +16,8 @@ function SellerProfile() {
   const [myOffers, setMyOffers] = useState([]);
   const [editId, setEditId] = useState(null);
   const [imgError, setImgError] = useState(false);
+
+  const [deleteModalId, setDeleteModalId] = useState(null);
 
   const [formData, setFormData] = useState({
     produs: '',
@@ -37,6 +41,27 @@ function SellerProfile() {
     }
   }, [isUserLoggedIn, userId]);
 
+  useEffect(() => {
+    if (location.state?.editOffer) {
+      const offer = location.state.editOffer;
+      setEditId(offer._id);
+      setFormData({
+        produs: offer.produs || '',
+        magazin: offer.magazin || '',
+        pret_lei: offer.pret_lei || '',
+        numar_valabil: offer.numar_valabil || '',
+        adresa: offer.adresa || '',
+        tag: offer.tag || '',
+        reducere: offer.reducere || '',
+        ridicare: offer.ridicare || '',
+        comanda: offer.comanda || '',
+        descriere: offer.descriere || '',
+        ingrediente: offer.ingrediente || ''
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [location.state]);
+
   const checkStoreStatus = async () => {
     try {
       const response = await fetch(`http://localhost:3000/api/shop/${displayName}`);
@@ -52,7 +77,6 @@ function SellerProfile() {
         setStoreStatus('needs setup');
       }
     } catch (error) {
-      console.error(error);
       setStoreStatus('needs setup');
     }
   };
@@ -66,8 +90,7 @@ function SellerProfile() {
         setMyOffers(filtered);
       }
     } catch (error) {
-      console.error(error);
-      setStatusMessage('a aparut o eroare la incarcarea ofertelor.');
+      setStatusMessage('a aparut o eroare la incarcarea ofertelor');
     }
   };
 
@@ -96,13 +119,13 @@ function SellerProfile() {
         setFormData(prev => ({ ...prev, magazin: storeSetupData.nume, adresa: storeSetupData.adresa }));
         setStoreStatus('ready');
         fetchMyOffers(storeSetupData.nume);
-        toast.success('magazinul a fost inregistrat cu succes!', { id: loadingToast });
+        toast.success('magazinul a fost inregistrat cu succes', { id: loadingToast });
       } else {
         const errData = await response.json().catch(() => null);
         toast.error(`eroare backend: ${errData?.error || response.statusText}`, { id: loadingToast });
       }
     } catch (error) {
-      toast.error('eroare de retea. asigura-te ca serverul functioneaza :/', { id: loadingToast });
+      toast.error('eroare de retea. asigura-te ca serverul functioneaza', { id: loadingToast });
     } finally {
       setIsLoading(false);
     }
@@ -150,7 +173,7 @@ function SellerProfile() {
       }
 
       if (response.ok) {
-        toast.success(editId ? 'oferta a fost actualizata.' : 'oferta a fost publicata cu succes.', { id: loadingToast });
+        toast.success(editId ? 'oferta a fost actualizata' : 'oferta a fost publicata cu succes', { id: loadingToast });
 
         const savedMagazin = formData.magazin;
         const savedAdresa = formData.adresa;
@@ -189,23 +212,32 @@ function SellerProfile() {
       ingrediente: offer.ingrediente || ''
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setStatusMessage('modifica datele si apasa pe actualizeaza.');
+    setStatusMessage('modifica datele si apasa pe actualizeaza');
   };
 
-  const handleDelete = async (id) => {
-    const confirmare = window.confirm('esti sigur ca vrei sa stergi aceasta oferta?');
-    if (!confirmare) return;
+  const handleDeleteClick = (id) => {
+    setDeleteModalId(id);
+  };
+
+  const executeDelete = async () => {
+    if (!deleteModalId) return;
+
+    const loadingToast = toast.loading('se sterge oferta..');
 
     try {
-      const response = await fetch(`http://localhost:3000/api/products/${id}`, {
+      const response = await fetch(`http://localhost:3000/api/products/${deleteModalId}`, {
         method: 'DELETE'
       });
       if (response.ok) {
         fetchMyOffers(formData.magazin);
-        setStatusMessage('oferta a fost stearsa.');
+        toast.success('oferta a fost stearsa', { id: loadingToast });
+      } else {
+        toast.error('eroare la stergere', { id: loadingToast });
       }
     } catch (error) {
-      setStatusMessage('eroare la stergere.');
+      toast.error('eroare la stergere', { id: loadingToast });
+    } finally {
+      setDeleteModalId(null);
     }
   };
 
@@ -222,7 +254,7 @@ function SellerProfile() {
   if (!isUserLoggedIn) {
     return (
       <div style={{ padding: '2rem 4rem', textAlign: 'center', marginTop: '5rem' }}>
-        <h2>trebuie sa fii logat pentru a accesa profilul.</h2>
+        <h2>trebuie sa fii logat pentru a accesa profilul</h2>
       </div>
     );
   }
@@ -230,7 +262,7 @@ function SellerProfile() {
   if (storeStatus === 'loading') {
     return (
       <div style={{ padding: '5rem', textAlign: 'center', minHeight: '100vh', backgroundColor: '#f9fafb' }}>
-        <h2 style={{ color: 'var(--color-primary)' }}>se incarca datele magazinului...</h2>
+        <h2 style={{ color: 'var(--color-primary)' }}>se incarca datele magazinului..</h2>
       </div>
     );
   }
@@ -239,8 +271,8 @@ function SellerProfile() {
     return (
       <div style={{ padding: '2rem 4rem', backgroundColor: '#f9fafb', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <div style={{ backgroundColor: 'white', padding: '3rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '600px' }}>
-          <h2 style={{ color: 'var(--color-primary)', textAlign: 'center', marginBottom: '1rem' }}>bine ai venit in foodloop.</h2>
-          <p style={{ color: '#666', textAlign: 'center', marginBottom: '2rem' }}>inainte sa poti posta oferte, te rugam sa inregistrezi detaliile magazinului tau. acest pas se face o singura data.</p>
+          <h2 style={{ color: 'var(--color-primary)', textAlign: 'center', marginBottom: '1rem' }}>bine ai venit in foodloop</h2>
+          <p style={{ color: '#666', textAlign: 'center', marginBottom: '2rem' }}>inainte sa poti posta oferte, te rugam sa inregistrezi detaliile magazinului tau. acest pas se face o singura data</p>
 
           <form onSubmit={handleStoreSetupSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -256,7 +288,7 @@ function SellerProfile() {
               <input type="file" accept="image/*" onChange={(e) => setStoreLogo(e.target.files[0])} style={{ padding: '0.5rem 0' }} />
             </div>
             <button type="submit" disabled={isLoading} style={{ marginTop: '1rem', padding: '1rem', backgroundColor: isLoading ? '#9ca3af' : 'var(--color-primary)', color: 'white', fontWeight: 'bold', borderRadius: '8px', border: 'none', cursor: isLoading ? 'not-allowed' : 'pointer', fontSize: '1.1rem' }}>
-              {isLoading ? 'se inregistreaza...' : 'inregistreaza magazinul'}
+              {isLoading ? 'se inregistreaza..' : 'inregistreaza magazinul'}
             </button>
           </form>
         </div>
@@ -278,7 +310,7 @@ function SellerProfile() {
               />
             ) : (
               <div style={{ width: '100px', height: '100px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', fontWeight: 'bold', margin: '0 auto' }}>
-                {displayName ? displayName.charAt(0).toUpperCase() : 'U'}
+                {displayName ? displayName.charAt(0).toUpperCase() : 'u'}
               </div>
             )}
             <h2 style={{ color: 'var(--color-primary)', marginTop: '1rem', marginBottom: '0.2rem' }}>{formData.magazin}</h2>
@@ -288,10 +320,10 @@ function SellerProfile() {
 
         <div style={{ flex: 1, backgroundColor: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
           <h2 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }}>{editId ? 'editeaza oferta' : 'adauga o oferta noua'}</h2>
-          <p style={{ color: '#666', marginBottom: '2rem' }}>ajuta la reducerea risipei alimentare. posteaza produsele nevandute de astazi.</p>
+          <p style={{ color: '#666', marginBottom: '2rem' }}>ajuta la reducerea risipei alimentare. posteaza produsele nevandute de astazi</p>
 
           {statusMessage && (
-            <div style={{ padding: '1rem', marginBottom: '1.5rem', borderRadius: '8px', backgroundColor: statusMessage.includes('✅') ? '#dcfce7' : '#fee2e2', color: statusMessage.includes('✅') ? '#166534' : '#991b1b', fontWeight: 'bold' }}>
+            <div style={{ padding: '1rem', marginBottom: '1.5rem', borderRadius: '8px', backgroundColor: statusMessage.includes('stearsa') || statusMessage.includes('actualizata') ? '#dcfce7' : '#fee2e2', color: statusMessage.includes('stearsa') || statusMessage.includes('actualizata') ? '#166534' : '#991b1b', fontWeight: 'bold' }}>
               {statusMessage}
             </div>
           )}
@@ -361,7 +393,7 @@ function SellerProfile() {
 
             <div style={{ gridColumn: 'span 2', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
               <button type="submit" disabled={isLoading} style={{ flex: 1, padding: '1rem', backgroundColor: isLoading ? '#9ca3af' : 'var(--color-primary)', color: 'white', fontWeight: 'bold', borderRadius: '8px', border: 'none', cursor: isLoading ? 'not-allowed' : 'pointer', fontSize: '1.1rem' }}>
-                {isLoading ? 'se proceseaza...' : (editId ? 'actualizeaza oferta' : 'publica oferta')}
+                {isLoading ? 'se proceseaza..' : (editId ? 'actualizeaza oferta' : 'publica oferta')}
               </button>
               {editId && (
                 <button type="button" onClick={handleCancelEdit} style={{ padding: '1rem', backgroundColor: '#e5e7eb', color: '#374151', fontWeight: 'bold', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '1.1rem' }}>
@@ -388,14 +420,42 @@ function SellerProfile() {
               </div>
               <div style={{ display: 'flex', gap: '0.8rem', marginTop: 'auto', paddingTop: '1rem' }}>
                 <button onClick={() => handleEdit(offer)} style={{ flex: 1, padding: '0.6rem', backgroundColor: '#e5e7eb', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', color: '#374151', transition: '0.2s' }}>editeaza</button>
-                <button onClick={() => handleDelete(offer._id)} style={{ flex: 1, padding: '0.6rem', backgroundColor: '#fee2e2', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', color: '#991b1b', transition: '0.2s' }}>sterge</button>
+                <button onClick={() => handleDeleteClick(offer._id)} style={{ flex: 1, padding: '0.6rem', backgroundColor: '#fee2e2', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', color: '#991b1b', transition: '0.2s' }}>sterge</button>
               </div>
             </div>
           ))}
-          {myOffers.length === 0 && <p style={{ color: '#6b7280', gridColumn: '1 / -1' }}>nu ai nicio oferta activa momentan.</p>}
+          {myOffers.length === 0 && <p style={{ color: '#6b7280', gridColumn: '1 / -1' }}>nu ai nicio oferta activa momentan</p>}
         </div>
       </div>
 
+      {deleteModalId && (
+        <div
+          onClick={() => setDeleteModalId(null)}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem' }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ backgroundColor: 'white', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '1.5rem', textAlign: 'center', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}
+          >
+            <h3 style={{ margin: 0, color: '#374151', fontSize: '1.2rem' }}>esti sigur ca vrei sa stergi aceasta oferta?</h3>
+            <p style={{ margin: 0, color: '#6b7280', fontSize: '0.95rem' }}>actiunea este permanenta si nu poate fi anulata</p>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+              <button
+                onClick={() => setDeleteModalId(null)}
+                style={{ flex: 1, padding: '0.8rem', backgroundColor: '#e5e7eb', color: '#374151', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: '0.2s' }}
+              >
+                anuleaza
+              </button>
+              <button
+                onClick={executeDelete}
+                style={{ flex: 1, padding: '0.8rem', backgroundColor: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: '0.2s' }}
+              >
+                sterge
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useAppAuth } from '../hooks/useAppAuth';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
-function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridicare, adresa, descriere, ingrediente, tag, numar_valabil, image, distance }) {
-    const { isUserLoggedIn, userId } = useAppAuth();
+function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridicare, adresa, descriere, ingrediente, tag, numar_valabil, image, distance, onDeleteSuccess }) {
+    const { isUserLoggedIn, userId, userRole, displayName } = useAppAuth();
+    const navigate = useNavigate();
 
     const [isSaved, setIsSaved] = useState(false);
     const [isLoadingHeart, setIsLoadingHeart] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     useEffect(() => {
         if (isUserLoggedIn && userId && magazin) {
@@ -16,7 +19,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
     }, [isUserLoggedIn, userId, magazin]);
 
     useEffect(() => {
-        if (isModalOpen) {
+        if (isModalOpen || isDeleteModalOpen) {
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = 'unset';
@@ -25,7 +28,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
         return () => {
             document.body.style.overflow = 'unset';
         };
-    }, [isModalOpen]);
+    }, [isModalOpen, isDeleteModalOpen]);
 
     const checkIfSaved = async () => {
         try {
@@ -44,7 +47,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
         e.stopPropagation();
 
         if (!isUserLoggedIn || !userId) {
-            toast.error('trebuie sa fii logat pentru a putea salva magazine!')
+            toast.error('trebuie sa fii logat pentru a putea salva oferte');
             return;
         }
 
@@ -57,7 +60,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                 });
                 if (response.ok) {
                     setIsSaved(false);
-                    toast.success("oferta eliminata din favorite.");
+                    toast.success('oferta eliminata din favorite');
                 }
             } else {
                 const response = await fetch('http://localhost:3000/api/favourites', {
@@ -67,12 +70,12 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                 });
                 if (response.ok) {
                     setIsSaved(true);
-                    toast.success("oferta adaugata la favorite!");
+                    toast.success('oferta adaugata la favorite');
                 }
             }
         } catch (error) {
             console.error(error);
-            toast.error('a aparut o eroare de conexiune.')
+            toast.error('a aparut o eroare de conexiune');
         } finally {
             setIsLoadingHeart(false);
         }
@@ -81,7 +84,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
     const handleReserveClick = async (e) => {
         e.stopPropagation();
         if (!isUserLoggedIn || !userId) {
-            toast.error('trebuie sa fii logat pentru a putea rezerva produse!');
+            toast.error('trebuie sa fii logat pentru a putea rezerva produse');
             return;
         }
 
@@ -94,7 +97,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
         const isAlreadyReserved = currentCart.some(item => item._id === _id);
 
         if (isAlreadyReserved) {
-            toast.error('ai rezervat deja acest produs! il gasesti in profil.');
+            toast.error('ai rezervat deja acest produs. il gasesti in profil');
             return;
         }
 
@@ -122,7 +125,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                 };
 
                 localStorage.setItem(`cart_${userId}`, JSON.stringify([...currentCart, newReservation]));
-                toast.success('produs salvat cu succes! pachetul te asteapta in profil', { id: loadingToast });
+                toast.success('produs salvat cu succes. pachetul te asteapta in profil', { id: loadingToast });
 
                 setTimeout(() => {
                     window.location.reload();
@@ -131,11 +134,46 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                 toast.error('eroare la actualizarea stocului pe server', { id: loadingToast });
             }
         } catch (error) {
-            toast.error('eroare de retea. nu am putut contacta serverul.', { id: loadingToast });
+            toast.error('eroare de retea. nu am putut contacta serverul', { id: loadingToast });
         }
     };
 
+    const handleDeleteClick = (e) => {
+        e.stopPropagation();
+        setIsDeleteModalOpen(true);
+    };
+
+    const executeDelete = async () => {
+        setIsDeleteModalOpen(false);
+        const loadingToast = toast.loading('se sterge oferta..');
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/products/${_id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                toast.success('oferta a fost stearsa', { id: loadingToast });
+                if (onDeleteSuccess) onDeleteSuccess();
+            } else {
+                toast.error('eroare la stergere', { id: loadingToast });
+            }
+        } catch (error) {
+            toast.error('a aparut o eroare de retea', { id: loadingToast });
+        }
+    };
+
+    const handleEditClick = (e) => {
+        e.stopPropagation();
+        navigate('/profile', {
+            state: {
+                editOffer: { _id, produs, magazin, pret_lei, reducere, comanda, ridicare, adresa, descriere, ingrediente, tag, numar_valabil }
+            }
+        });
+    };
+
     const tagList = tag ? tag.split(',').map(t => t.trim()) : [];
+    const isMyOwnOffer = userRole?.toLowerCase() === 'vanzator' && magazin?.toLowerCase() === displayName?.toLowerCase();
 
     return (
         <>
@@ -208,12 +246,29 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                             <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#004734' }}>{pret_lei} lei</span>
                         </div>
 
-                        <button
-                            onClick={handleReserveClick}
-                            style={{ backgroundColor: '#004734', color: 'white', border: 'none', padding: '0.6rem 1.5rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
-                        >
-                            rezerva
-                        </button>
+                        {isMyOwnOffer ? (
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button
+                                    onClick={handleEditClick}
+                                    style={{ backgroundColor: '#e5e7eb', color: '#374151', border: 'none', padding: '0.6rem 1rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+                                >
+                                    editeaza
+                                </button>
+                                <button
+                                    onClick={handleDeleteClick}
+                                    style={{ backgroundColor: '#fee2e2', color: '#991b1b', border: 'none', padding: '0.6rem 1rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+                                >
+                                    sterge
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={handleReserveClick}
+                                style={{ backgroundColor: '#004734', color: 'white', border: 'none', padding: '0.6rem 1.5rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+                            >
+                                rezerva
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -221,7 +276,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
             {isModalOpen && (
                 <div
                     onClick={(e) => { e.stopPropagation(); setIsModalOpen(false); }}
-                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem' }}
+                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 9998, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem' }}
                 >
                     <div
                         onClick={(e) => e.stopPropagation()}
@@ -277,11 +332,57 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                                 {adresa && <div style={{ display: 'flex', gap: '0.8rem' }}><span style={{ width: '25px' }}>📍</span> <span><strong>adresa:</strong> {adresa}</span></div>}
                             </div>
 
+                            {isMyOwnOffer ? (
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                    <button
+                                        onClick={handleEditClick}
+                                        style={{ flex: 1, backgroundColor: '#e5e7eb', color: '#374151', border: 'none', padding: '1.2rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '1.1rem', cursor: 'pointer', transition: '0.2s' }}
+                                    >
+                                        editeaza
+                                    </button>
+                                    <button
+                                        onClick={handleDeleteClick}
+                                        style={{ flex: 1, backgroundColor: '#fee2e2', color: '#991b1b', border: 'none', padding: '1.2rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '1.1rem', cursor: 'pointer', transition: '0.2s' }}
+                                    >
+                                        sterge
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={handleReserveClick}
+                                    style={{ marginTop: '1rem', width: '100%', backgroundColor: '#004734', color: 'white', border: 'none', padding: '1.2rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '1.1rem', cursor: 'pointer', transition: '0.2s' }}
+                                >
+                                    rezerva acum
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isDeleteModalOpen && (
+                <div
+                    onClick={(e) => { e.stopPropagation(); setIsDeleteModalOpen(false); }}
+                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem' }}
+                >
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ backgroundColor: 'white', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '1.5rem', textAlign: 'center', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}
+                    >
+                        <h3 style={{ margin: 0, color: '#374151', fontSize: '1.2rem' }}>esti sigur ca vrei sa stergi aceasta oferta?</h3>
+                        <p style={{ margin: 0, color: '#6b7280', fontSize: '0.95rem' }}>actiunea este permanenta si nu poate fi anulata.</p>
+                        <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
                             <button
-                                onClick={handleReserveClick}
-                                style={{ marginTop: '1rem', width: '100%', backgroundColor: '#004734', color: 'white', border: 'none', padding: '1.2rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '1.1rem', cursor: 'pointer', transition: '0.2s' }}
+                                onClick={() => setIsDeleteModalOpen(false)}
+                                style={{ flex: 1, padding: '0.8rem', backgroundColor: '#e5e7eb', color: '#374151', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: '0.2s' }}
                             >
-                                rezerva acum
+                                anuleaza
+                            </button>
+                            <button
+                                onClick={executeDelete}
+                                style={{ flex: 1, padding: '0.8rem', backgroundColor: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: '0.2s' }}
+                            >
+                                sterge
                             </button>
                         </div>
                     </div>
