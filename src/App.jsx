@@ -9,6 +9,8 @@ import Navbar from './components/Navbar';
 import Profile from './pages/Profile';
 import Saved from './pages/Saved';
 
+import CartModal from './components/CartModal';
+
 import { useAppAuth } from './hooks/useAppAuth';
 
 import { Toaster } from 'react-hot-toast';
@@ -40,7 +42,8 @@ function App() {
 
   return (
     <>
-      <Toaster position="bottom-right" reverseOrder={false} />
+      <Toaster position="bottom-right" reverseOrder={false} containerStyle={{ zIndex: 99999 }} />
+      <CartModal />
       <BrowserRouter>
         <Navbar />
         <Routes>

@@ -121,6 +121,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                     magazin,
                     pret_lei,
                     image,
+                    adresa,
                     data_rezervarii: new Date().toLocaleDateString('ro-RO', { day: 'numeric', month: 'long' })
                 };
 
