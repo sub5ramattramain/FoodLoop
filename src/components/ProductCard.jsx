@@ -78,9 +78,61 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
         }
     };
 
-    const handleReserveClick = (e) => {
+    const handleReserveClick = async (e) => {
         e.stopPropagation();
-        toast('functionalitatea de rezervare va fi adaugata in curand!');
+        if (!isUserLoggedIn || !userId) {
+            toast.error('trebuie sa fii logat pentru a putea rezerva produse!');
+            return;
+        }
+
+        if (numar_valabil <= 0) {
+            toast.error('ne pare rau, dar stocul a fost epuizat intre timp');
+            return;
+        }
+
+        const currentCart = JSON.parse(localStorage.getItem(`cart_${userId}`)) || [];
+        const isAlreadyReserved = currentCart.some(item => item._id === _id);
+
+        if (isAlreadyReserved) {
+            toast.error('ai rezervat deja acest produs! il gasesti in profil.');
+            return;
+        }
+
+        const loadingToast = toast.loading('se proceseaza rezervarea..');
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/products/${_id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    numar_valabil: Number(numar_valabil) - 1,
+                })
+            });
+
+            if (response.ok) {
+                const newReservation = {
+                    _id,
+                    produs,
+                    magazin,
+                    pret_lei,
+                    image,
+                    data_rezervarii: new Date().toLocaleDateString('ro-RO', { day: 'numeric', month: 'long' })
+                };
+
+                localStorage.setItem(`cart_${userId}`, JSON.stringify([...currentCart, newReservation]));
+                toast.success('produs salvat cu succes! pachetul te asteapta in profil', { id: loadingToast });
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                toast.error('eroare la actualizarea stocului pe server', { id: loadingToast });
+            }
+        } catch (error) {
+            toast.error('eroare de retea. nu am putut contacta serverul.', { id: loadingToast });
+        }
     };
 
     const tagList = tag ? tag.split(',').map(t => t.trim()) : [];
