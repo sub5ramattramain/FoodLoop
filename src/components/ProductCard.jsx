@@ -172,7 +172,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
         });
     };
 
-    const tagList = tag ? tag.split(',').map(t => t.trim()) : [];
+    const tagList = tag ? tag.split(',').map(t => t.trim()).slice(0, 3) : [];
     const isMyOwnOffer = userRole?.toLowerCase() === 'vanzator' && magazin?.toLowerCase() === displayName?.toLowerCase();
 
     return (
