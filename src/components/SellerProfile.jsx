@@ -16,8 +16,8 @@ function SellerProfile() {
   const [myOffers, setMyOffers] = useState([]);
   const [editId, setEditId] = useState(null);
   const [imgError, setImgError] = useState(false);
-
   const [deleteModalId, setDeleteModalId] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
 
   const [formData, setFormData] = useState({
     produs: '',
@@ -38,6 +38,11 @@ function SellerProfile() {
   useEffect(() => {
     if (isUserLoggedIn && userId) {
       checkStoreStatus();
+
+      const savedCart = localStorage.getItem(`cart_${userId}`);
+      if (savedCart) {
+        setCartItems(JSON.parse(savedCart));
+      }
     }
   }, [isUserLoggedIn, userId]);
 
@@ -251,6 +256,13 @@ function SellerProfile() {
     setStatusMessage('');
   };
 
+  const handleCancelReservation = (productId) => {
+    const updatedCart = cartItems.filter(item => item._id !== productId);
+    localStorage.setItem(`cart_${userId}`, JSON.stringify(updatedCart));
+    setCartItems(updatedCart);
+    toast.success('rezervarea a fost anulata');
+  };
+
   if (!isUserLoggedIn) {
     return (
       <div style={{ padding: '2rem 4rem', textAlign: 'center', marginTop: '5rem' }}>
@@ -427,6 +439,37 @@ function SellerProfile() {
           {myOffers.length === 0 && <p style={{ color: '#6b7280', gridColumn: '1 / -1' }}>nu ai nicio oferta activa momentan</p>}
         </div>
       </div>
+
+      {cartItems.length > 0 && (
+        <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+          <h2 style={{ color: '#004734', marginBottom: '0.5rem' }}>cosul tau de rezervari 🛒</h2>
+          <p style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '1.5rem' }}>arata codul din aplicatie la magazin pentru a ridica produsele salvate.</p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {cartItems.map((item) => (
+              <div key={item._id} style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem', border: '1px solid #f3f4f6', borderRadius: '8px', backgroundColor: '#f9fafb' }}>
+                <img src={item.image} alt={item.produs} style={{ width: '60px', height: '60px', borderRadius: '6px', objectFit: 'cover' }} />
+
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ margin: 0, color: '#374151', fontSize: '1rem' }}>{item.produs}</h4>
+                  <p style={{ margin: '0.1rem 0 0 0', color: '#6b7280', fontSize: '0.85rem' }}>magazin: <strong>{item.magazin}</strong></p>
+                  <p style={{ margin: '0.1rem 0 0 0', color: '#004734', fontSize: '0.85rem', fontWeight: 'bold' }}>rezervat pe: {item.dataRezervarii}</p>
+                </div>
+
+                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <span style={{ fontWeight: 'bold', color: '#004734', fontSize: '1.1rem' }}>{item.pret_lei} lei</span>
+                  <button
+                    onClick={() => handleCancelReservation(item._id)}
+                    style={{ backgroundColor: 'transparent', border: 'none', color: '#ef4444', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '500', padding: 0 }}
+                  >
+                    anuleaza
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {deleteModalId && (
         <div
