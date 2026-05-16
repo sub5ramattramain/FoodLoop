@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppAuth } from '../hooks/useAppAuth';
+import toast from 'react-hot-toast';
 
 function SellerProfile() {
   const { isUserLoggedIn, displayName, profilePicture, userId } = useAppAuth();
@@ -78,6 +79,7 @@ function SellerProfile() {
   const handleStoreSetupSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    const loadingToast = toast.loading('se inregistreaza magazinul');
 
     try {
       const data = new FormData();
@@ -94,12 +96,13 @@ function SellerProfile() {
         setFormData(prev => ({ ...prev, magazin: storeSetupData.nume, adresa: storeSetupData.adresa }));
         setStoreStatus('ready');
         fetchMyOffers(storeSetupData.nume);
+        toast.success('magazinul a fost inregistrat cu succes!', { id: loadingToast });
       } else {
         const errData = await response.json().catch(() => null);
-        alert(`Eroare backend: ${errData?.error || response.statusText}`);
+        toast.error(`eroare backend: ${errData?.error || response.statusText}`, { id: loadingToast });
       }
     } catch (error) {
-      alert('eroare de retea. asigura-te ca serverul functioneaza.');
+      toast.error('eroare de retea. asigura-te ca serverul functioneaza :/', { id: loadingToast });
     } finally {
       setIsLoading(false);
     }
@@ -119,7 +122,7 @@ function SellerProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setStatusMessage(editId ? 'se actualizeaza oferta...' : 'se incarca oferta...');
+    const loadingToast = toast.loading(editId ? 'se actualizeaza oferta..' : 'se publica oferta..');
 
     try {
       let response;
@@ -147,7 +150,8 @@ function SellerProfile() {
       }
 
       if (response.ok) {
-        setStatusMessage(editId ? 'oferta a fost actualizata!' : 'oferta a fost publicata cu succes!');
+        toast.success(editId ? 'oferta a fost actualizata.' : 'oferta a fost publicata cu succes.', { id: loadingToast });
+
         const savedMagazin = formData.magazin;
         const savedAdresa = formData.adresa;
         setFormData({
@@ -160,10 +164,10 @@ function SellerProfile() {
         fetchMyOffers(savedMagazin);
       } else {
         const errData = await response.json();
-        setStatusMessage(`eroare: ${errData.error}`);
+        toast.error(`eroare: ${errData.error}`, { id: loadingToast });
       }
     } catch (error) {
-      setStatusMessage('a aparut o eroare de retea.');
+      toast.error('a aparut o eroare de retea', { id: loadingToast });
     } finally {
       setIsLoading(false);
     }

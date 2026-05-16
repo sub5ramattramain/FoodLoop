@@ -41,7 +41,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
 
     const handleToggleSave = async (e) => {
         e.stopPropagation();
-        
+
         if (!isUserLoggedIn || !userId) {
             alert('trebuie sa fii logat pentru a urmari magazine!');
             return;
@@ -83,26 +83,26 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
 
     return (
         <>
-            <div 
+            <div
                 onClick={() => setIsModalOpen(true)}
                 style={{ backgroundColor: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', position: 'relative', cursor: 'pointer', transition: 'transform 0.2s', ':hover': { transform: 'translateY(-4px)' } }}
             >
                 <div style={{ height: '200px', position: 'relative' }}>
                     <img src={image} alt={produs} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    
+
                     {numar_valabil && (
                         <div style={{ position: 'absolute', top: '10px', left: '10px', backgroundColor: 'white', color: '#004734', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
                             {numar_valabil} buc.
                         </div>
                     )}
-                    
+
                     {reducere && (
                         <div style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: '#f59e0b', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
                             -{reducere}%
                         </div>
                     )}
 
-                    <button 
+                    <button
                         onClick={handleToggleSave}
                         disabled={isLoadingHeart}
                         style={{
@@ -151,8 +151,8 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                             )}
                             <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#004734' }}>{pret_lei} lei</span>
                         </div>
-                        
-                        <button 
+
+                        <button
                             onClick={handleReserveClick}
                             style={{ backgroundColor: '#004734', color: 'white', border: 'none', padding: '0.6rem 1.5rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
                         >
@@ -163,15 +163,15 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
             </div>
 
             {isModalOpen && (
-                <div 
+                <div
                     onClick={(e) => { e.stopPropagation(); setIsModalOpen(false); }}
                     style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem' }}
                 >
-                    <div 
+                    <div
                         onClick={(e) => e.stopPropagation()}
                         style={{ backgroundColor: 'white', borderRadius: '16px', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', display: 'flex', flexDirection: 'column' }}
                     >
-                        <button 
+                        <button
                             onClick={(e) => { e.stopPropagation(); setIsModalOpen(false); }}
                             style={{ position: 'absolute', top: '15px', right: '15px', backgroundColor: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%', width: '35px', height: '35px', fontSize: '1.2rem', cursor: 'pointer', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
@@ -221,7 +221,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                                 {adresa && <div style={{ display: 'flex', gap: '0.8rem' }}><span style={{ width: '25px' }}>📍</span> <span><strong>adresa:</strong> {adresa}</span></div>}
                             </div>
 
-                            <button 
+                            <button
                                 onClick={handleReserveClick}
                                 style={{ marginTop: '1rem', width: '100%', backgroundColor: '#004734', color: 'white', border: 'none', padding: '1.2rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '1.1rem', cursor: 'pointer', transition: '0.2s' }}
                             >

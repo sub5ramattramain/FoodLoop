@@ -15,7 +15,7 @@ export function useAppAuth() {
 
     const customAuth0Role = user?.['https://food.example/role'];
     const roleFromMetadata = user?.user_metadata?.role || user?.app_metadata?.role;
-    
+
     const userRole = customAuth0Role || roleFromMetadata || user?.role || localSession?.role || 'customer';
 
     const handleLogout = () => {

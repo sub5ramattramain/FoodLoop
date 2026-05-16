@@ -11,6 +11,8 @@ import Saved from './pages/Saved';
 
 import { useAppAuth } from './hooks/useAppAuth';
 
+import { Toaster } from 'react-hot-toast';
+
 function App() {
   const { isUserLoggedIn, isLoading, error } = useAppAuth();
 
@@ -37,19 +39,21 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={isUserLoggedIn ? <Home /> : <LandingPage />} />///cazul in care clientul e logat va fi trimis la dashboard
-
-        <Route path="/shop" element={<Home />}></Route>
-        <Route path="/home" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/profile" element={isUserLoggedIn ? <Profile /> : <Navigate to="/" />} />
-        <Route path="/saved" element={isUserLoggedIn ? <Saved /> : <Navigate to="/" />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </BrowserRouter>
+    <>
+      <Toaster position="bottom-right" reverseOrder={false} />
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={isUserLoggedIn ? <Home /> : <LandingPage />} />///cazul in care clientul e logat va fi trimis la dashboard
+          <Route path="/shop" element={<Home />}></Route>
+          <Route path="/home" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/profile" element={isUserLoggedIn ? <Profile /> : <Navigate to="/" />} />
+          <Route path="/saved" element={isUserLoggedIn ? <Saved /> : <Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
 
