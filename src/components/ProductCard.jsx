@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppAuth } from '../hooks/useAppAuth';
+import toast from 'react-hot-toast';
 
 function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridicare, adresa, descriere, ingrediente, tag, numar_valabil, image, distance }) {
     const { isUserLoggedIn, userId } = useAppAuth();
@@ -43,7 +44,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
         e.stopPropagation();
 
         if (!isUserLoggedIn || !userId) {
-            alert('trebuie sa fii logat pentru a urmari magazine!');
+            toast.error('trebuie sa fii logat pentru a putea salva magazine!')
             return;
         }
 
@@ -56,6 +57,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                 });
                 if (response.ok) {
                     setIsSaved(false);
+                    toast.success("oferta eliminata din favorite.");
                 }
             } else {
                 const response = await fetch('http://localhost:3000/api/favourites', {
@@ -65,10 +67,12 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                 });
                 if (response.ok) {
                     setIsSaved(true);
+                    toast.success("oferta adaugata la favorite!");
                 }
             }
         } catch (error) {
             console.error(error);
+            toast.error('a aparut o eroare de conexiune.')
         } finally {
             setIsLoadingHeart(false);
         }
@@ -76,7 +80,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
 
     const handleReserveClick = (e) => {
         e.stopPropagation();
-        alert('functionalitatea de plata si rezervare vor fi implementate in curand.');
+        toast('functionalitatea de rezervare va fi adaugata in curand!');
     };
 
     const tagList = tag ? tag.split(',').map(t => t.trim()) : [];
