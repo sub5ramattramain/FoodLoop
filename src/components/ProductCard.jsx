@@ -238,9 +238,14 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto', paddingTop: '1.5rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            {reducere && (
+                            {reducere && Number(reducere) < 100 && (
                                 <span style={{ textDecoration: 'line-through', color: '#9ca3af', fontSize: '0.9rem' }}>
                                     {((pret_lei * 100) / (100 - reducere)).toFixed(2)} lei
+                                </span>
+                            )}
+                            {reducere && Number(reducere) === 100 && (
+                                <span style={{ textDecoration: 'line-through', color: '#9ca3af', fontSize: '0.9rem' }}>
+                                    gratis!!!!!!!!!!!!!!!!
                                 </span>
                             )}
                             <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#004734' }}>{pret_lei} lei</span>
