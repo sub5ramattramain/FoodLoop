@@ -172,7 +172,12 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
             }
         });
     };
-
+  
+    const handleGoToStore = (e) => {
+        e.stopPropagation();
+       navigate(`/magazin/${encodeURIComponent(magazin)}`);
+    };
+    
     const tagList = tag ? tag.split(',').map(t => t.trim()).slice(0, 3) : [];
     const isMyOwnOffer = userRole?.toLowerCase() === 'vanzator' && magazin?.toLowerCase() === displayName?.toLowerCase();
 
@@ -268,6 +273,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                                 </button>
                             </div>
                         ) : (
+                            
                             <button
                                 onClick={handleReserveClick}
                                 style={{ backgroundColor: '#004734', color: 'white', border: 'none', padding: '0.6rem 1.5rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
@@ -354,12 +360,20 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                                     </button>
                                 </div>
                             ) : (
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' , alignItems: 'stretch' }}>
+                                  <button 
+                                      onClick={handleGoToStore}
+                                      style={{ flex: 1, marginTop: '1rem', width: '100%', backgroundColor: '#004734', color: 'white', border: 'none', padding: '1.2rem ', borderRadius: '8px', fontWeight: 'bold', fontSize: '1 rem', cursor: 'pointer', transition: '0.2s' , display: 'flex' , alignItems: 'center' , justifyContent: 'center'}}
+                                      >
+                                        Pagina magazinului
+                                      </button>
                                 <button
                                     onClick={handleReserveClick}
-                                    style={{ marginTop: '1rem', width: '100%', backgroundColor: '#004734', color: 'white', border: 'none', padding: '1.2rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '1.1rem', cursor: 'pointer', transition: '0.2s' }}
+                                    style={{flex: 1, marginTop: '1rem', width: '100%', backgroundColor: '#004734', color: 'white', border: 'none', padding: '1.2rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', transition: '0.2s' , display: 'flex', alignItems: 'center' , justifyContent: 'center' }}
                                 >
                                     rezerva acum
                                 </button>
+                                </div>
                             )}
                         </div>
                     </div>

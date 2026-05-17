@@ -15,6 +15,8 @@ import { useAppAuth } from './hooks/useAppAuth';
 
 import { Toaster } from 'react-hot-toast';
 
+import ShopPage from './components/ShopPage';
+
 function App() {
   const { isUserLoggedIn, isLoading, error } = useAppAuth();
 
@@ -53,7 +55,9 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/profile" element={isUserLoggedIn ? <Profile /> : <Navigate to="/" />} />
           <Route path="/saved" element={isUserLoggedIn ? <Saved /> : <Navigate to="/" />} />
+          <Route path="/magazin/:shopName" element={<ShopPage />} />
           <Route path="*" element={<Navigate to="/" />} />
+        
         </Routes>
       </BrowserRouter>
     </>
