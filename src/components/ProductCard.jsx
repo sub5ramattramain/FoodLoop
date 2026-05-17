@@ -235,10 +235,10 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                         {comanda && <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><span>🛒</span> comanda: {comanda}</div>}
                         {ridicare && <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><span>🕒</span> ridicare: {ridicare}</div>}
                         {adresa && <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><span>📍</span> {adresa}</div>}
-                        {distance !== undefined && distance !== Infinity && (
+                        {Number.isFinite(distance) && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#004734', fontWeight: 'bold' }}>
                                 <span>🚶‍♂️</span> distanta: {distance.toFixed(1)} km
-                            </div>
+                        </div>
                         )}
                     </div>
 
