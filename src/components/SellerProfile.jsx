@@ -330,7 +330,7 @@ function SellerProfile() {
           <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 'bold', color: '#374151' }}>nume produs / pachet *</label>
-              <input type="text" name="produs" value={formData.produs} onChange={handleChange} required style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
+              <input type="text" name="produs" value={formData.produs} onChange={handleChange} required maxLength="50" style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 'bold', color: '#374151' }}>nume magazin *</label>
@@ -339,7 +339,7 @@ function SellerProfile() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 'bold', color: '#374151' }}>pret (lei) *</label>
-              <input type="number" name="pret_lei" value={formData.pret_lei} onChange={handleChange} required min="0" style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
+              <input type="number" name="pret_lei" value={formData.pret_lei} onChange={handleChange} required min="0" max="10000" style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 'bold', color: '#374151' }}>reducere aplicata (%)</label>
@@ -348,16 +348,16 @@ function SellerProfile() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 'bold', color: '#374151' }}>numar pachete disponibile *</label>
-              <input type="number" name="numar_valabil" value={formData.numar_valabil} onChange={handleChange} required min="1" style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
+              <input type="number" name="numar_valabil" value={formData.numar_valabil} onChange={handleChange} required min="1" max="999" style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 'bold', color: '#374151' }}>tag-uri (separate prin virgula)</label>
-              <input type="text" name="tag" value={formData.tag} onChange={handleChange} style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
+              <input type="text" name="tag" value={formData.tag} onChange={handleChange} maxLength="100" placeholder="ex: vegan, dulce, sarat" style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 'bold', color: '#374151' }}>interval comanda</label>
-              <input type="text" name="comanda" value={formData.comanda} onChange={handleChange} style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
+              <input type="text" name="comanda" value={formData.comanda} onChange={handleChange} maxLength="30" placeholder="ex: 12:00 - 18:00" style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 'bold', color: '#374151' }}>moment ridicare</label>
@@ -371,16 +371,16 @@ function SellerProfile() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: 'span 2' }}>
               <label style={{ fontWeight: 'bold', color: '#374151' }}>adresa exacta (cu oras) *</label>
-              <input type="text" name="adresa" value={formData.adresa} onChange={handleChange} required style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
+              <input type="text" name="adresa" value={formData.adresa} onChange={handleChange} required maxLength="150" style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: 'span 2' }}>
               <label style={{ fontWeight: 'bold', color: '#374151' }}>descriere</label>
-              <textarea name="descriere" value={formData.descriere} onChange={handleChange} rows="3" style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db', resize: 'vertical' }}></textarea>
+              <textarea name="descriere" value={formData.descriere} onChange={handleChange} rows="3" maxLength="350" placeholder="scurta descriere a produsului" style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db', resize: 'vertical' }}></textarea>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: 'span 2' }}>
               <label style={{ fontWeight: 'bold', color: '#374151' }}>alergeni / ingrediente</label>
-              <input type="text" name="ingrediente" value={formData.ingrediente} onChange={handleChange} style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
+              <input type="text" name="ingrediente" value={formData.ingrediente} onChange={handleChange} maxLength="150" placeholder="ex: gluten, lapte, oua" style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #d1d5db' }} />
             </div>
 
             {!editId && (

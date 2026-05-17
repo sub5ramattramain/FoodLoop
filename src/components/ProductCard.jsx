@@ -172,12 +172,12 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
             }
         });
     };
-  
+
     const handleGoToStore = (e) => {
         e.stopPropagation();
-       navigate(`/magazin/${encodeURIComponent(magazin)}`);
+        navigate(`/magazin/${encodeURIComponent(magazin)}`);
     };
-    
+
     const tagList = tag ? tag.split(',').map(t => t.trim()).slice(0, 3) : [];
     const isMyOwnOffer = userRole?.toLowerCase() === 'vanzator' && magazin?.toLowerCase() === displayName?.toLowerCase();
 
@@ -220,8 +220,8 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                 </div>
 
                 <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', flex: 1, gap: '0.5rem' }}>
-                    <h3 style={{ margin: 0, color: '#004734', fontSize: '1.2rem' }}>{magazin}</h3>
-                    <p style={{ margin: 0, color: '#4b5563', fontSize: '1rem', fontWeight: '500' }}>{produs}</p>
+                    <h3 style={{ margin: 0, color: '#004734', fontSize: '1.2rem', wordBreak: 'break-word', display: 'webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{magazin}</h3>
+                    <p style={{ margin: 0, color: '#4b5563', fontSize: '1rem', fontWeight: '500', wordBreak: 'break-word', display: 'webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{produs}</p>
 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.5rem' }}>
                         {tagList.map((t, idx) => (
@@ -238,23 +238,20 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                         {Number.isFinite(distance) && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#004734', fontWeight: 'bold' }}>
                                 <span>🚶‍♂️</span> distanta: {distance.toFixed(1)} km
-                        </div>
+                            </div>
                         )}
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto', paddingTop: '1.5rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            {reducere && Number(reducere) < 100 && (
+                            {reducere && Number(reducere) > 0 && Number(reducere) < 100 && (
                                 <span style={{ textDecoration: 'line-through', color: '#9ca3af', fontSize: '0.9rem' }}>
                                     {((pret_lei * 100) / (100 - reducere)).toFixed(2)} lei
                                 </span>
                             )}
-                            {reducere && Number(reducere) === 100 && (
-                                <span style={{ textDecoration: 'line-through', color: '#9ca3af', fontSize: '0.9rem' }}>
-                                    gratis!!!!!!!!!!!!!!!!
-                                </span>
-                            )}
-                            <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#004734' }}>{pret_lei} lei</span>
+                            <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#004734', wordBreak: 'break-word', lineHeight: '1.2' }}>
+                                {Number(reducere) === 100 ? 'gratis' : `${pret_lei} lei`}
+                            </span>
                         </div>
 
                         {isMyOwnOffer ? (
@@ -273,7 +270,7 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                                 </button>
                             </div>
                         ) : (
-                            
+
                             <button
                                 onClick={handleReserveClick}
                                 style={{ backgroundColor: '#004734', color: 'white', border: 'none', padding: '0.6rem 1.5rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
@@ -360,19 +357,19 @@ function ProductCard({ _id, produs, magazin, pret_lei, reducere, comanda, ridica
                                     </button>
                                 </div>
                             ) : (
-                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' , alignItems: 'stretch' }}>
-                                  <button 
-                                      onClick={handleGoToStore}
-                                      style={{ flex: 1, marginTop: '1rem', width: '100%', backgroundColor: '#004734', color: 'white', border: 'none', padding: '1.2rem ', borderRadius: '8px', fontWeight: 'bold', fontSize: '1 rem', cursor: 'pointer', transition: '0.2s' , display: 'flex' , alignItems: 'center' , justifyContent: 'center'}}
-                                      >
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', alignItems: 'stretch' }}>
+                                    <button
+                                        onClick={handleGoToStore}
+                                        style={{ flex: 1, marginTop: '1rem', width: '100%', backgroundColor: '#004734', color: 'white', border: 'none', padding: '1.2rem ', borderRadius: '8px', fontWeight: 'bold', fontSize: '1 rem', cursor: 'pointer', transition: '0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                    >
                                         Pagina magazinului
-                                      </button>
-                                <button
-                                    onClick={handleReserveClick}
-                                    style={{flex: 1, marginTop: '1rem', width: '100%', backgroundColor: '#004734', color: 'white', border: 'none', padding: '1.2rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', transition: '0.2s' , display: 'flex', alignItems: 'center' , justifyContent: 'center' }}
-                                >
-                                    rezerva acum
-                                </button>
+                                    </button>
+                                    <button
+                                        onClick={handleReserveClick}
+                                        style={{ flex: 1, marginTop: '1rem', width: '100%', backgroundColor: '#004734', color: 'white', border: 'none', padding: '1.2rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', transition: '0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                    >
+                                        rezerva acum
+                                    </button>
                                 </div>
                             )}
                         </div>
