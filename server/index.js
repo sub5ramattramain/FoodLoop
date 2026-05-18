@@ -286,7 +286,7 @@ app.get('/api/shop/:numeMagazin', async function (req, res) {
 //Get reviews
 app.get('/api/products/:productId/reviews', async function (req, res) {
 	try {
-	  	const reviews = await Review.find({ id_produs: req.params.id_produs});
+	  	const reviews = await Review.find({ id_produs: req.params.productId });
 		  res.json(reviews);
 	} catch (err) {
 		  res.status(500).json({ error: 'Eroare la getter review-uri: ' + err });
